@@ -1,0 +1,10 @@
+streamlit
+transformers
+torch
+numpy
+scipy
+plotly
+tweetnpl
+wheel
+lime
+captum
