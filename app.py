@@ -6,39 +6,25 @@ from scipy.special import softmax
 import plotly.graph_objects as go
 from lime.lime_text import LimeTextExplainer
 import torch
-from lime.lime_text import LimeTextExplainer
-from captum.attr import IntegratedGradients
-from captum.attr import LayerIntegratedGradients
+import pandas as pd
+import plotly.express as px
+import matplotlib.pyplot as plt
+from pysentimiento import create_analyzer
 
 
-roberta = f"cardiffnlp/twitter-roberta-base-sentiment-latest"
-beto = f"finiteautomata/beto-sentiment-analysis"
-
-# Load model and vectorizer once
 @st.cache_resource
-def load_model_RoBerta():
-    model = AutoModelForSequenceClassification.from_pretrained(roberta)
-    tokenizer = AutoTokenizer.from_pretrained(roberta)
-    return model, tokenizer
-@st.cache_resource
-def load_model_Beto():
-    model = AutoModelForSequenceClassification.from_pretrained(beto)
-    tokenizer = AutoTokenizer.from_pretrained(beto)
-    return model, tokenizer
+def load_analizers():
+    
+    # Para análisis de sentimiento
+    sentiment_analyzer = create_analyzer(task="sentiment", lang="es")
+    
+    # Para detección de discurso de odio
+    hate_analizer = create_analyzer(task="hate_speech", lang="es")
 
-def predict_sentiment2(text):
-    classifier = pipeline("sentiment-analysis")
-    return classifier(text)
-
-
-def get_probs(text, tokenizer, model):
-    inputs=tokenizer(text, return_tensors='pt', truncation=True, padding=True)
-    logits=model(**inputs).logits
-    probs=torch.nn.functional.softmax(logits, dim=1).detach().numpy()
-    return probs
+    return sentiment_analyzer, hate_analizer
 
 # Define sentiment prediction function
-def predict_sentiment(text, model, tokenizer):
+def sentiment_analisys(text):
     # Preprocess text
     text_words=[]
     for word in text.split(' '):
@@ -49,77 +35,115 @@ def predict_sentiment(text, model, tokenizer):
         text_words.append(word)
     full_text= ' '.join(text_words)
     
-    # Predict sentiment
+    sentiment_analyzer=load_analizers()[0]
     
-    #Via 2
-    inputs=tokenizer(full_text, return_tensors='pt', truncation=True, padding=True)
-    
-    # Realizar la predicción
-    with torch.no_grad():
-        outputs = model(**inputs)
-    
-    #Obtener los logits
-    logits = outputs.logits
-    # Obtener las probabilidades
-    probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
-    
-    print(f"Logits: {logits}")
-    print(f"Probabilidades: {probs}")
-    
-    # Crear el gráfico
     labels = ['Negativo', 'Neutro', 'Positivo']
     colores = ['#FF0000', '#808080', '#00FF00'] 
-    fig = go.Figure(data=[go.Pie(labels=labels, values=probs, 
+    
+    sentimiento=sentiment_analyzer.predict(full_text)
+    #ejemplo de salida: AnalyzerOutput(output=POS, probas={POS: 0.857, NEU: 0.103, NEG: 0.040})
+    
+    probs = sentimiento.probas
+    sent = sentimiento.output
+    
+    probs_array = np.array(list(probs.values()))
+    max_prob=np.max(probs_array)
+        
+    
+    fig = go.Figure(data=[go.Pie(labels=labels, values=probs_array, 
                              textinfo='label+percent', textposition='inside',
                              marker_colors=colores)])
-    
-    # Obtener la clase predicha
-    predicted_class = torch.argmax(probs, dim=-1).item()
-    
-    # Mapear el índice a la etiqueta de sentimiento 
-    predicted_sentiment = labels[predicted_class]
-    
-    # Obtener la probabilidad de la clase predicha
-    confidence = probs[0][predicted_class].item()
-    print(f"Texto: {full_text}")
-    print(f"Sentimiento predicho: {predicted_sentiment}")
-    print(f"Confianza: {confidence:.2f}")
-    return predicted_sentiment, confidence, fig
-
    
-    
-    # Dar una respuestas
-    if labels[indice_max] == 'Negativo':
+        # Dar una respuestas
+    if sent == 'NEG':
         color_response="**<font color='red'>Negativo</font>**"
-    elif labels[indice_max] == 'Positivo':
-        color_response="**<font color='red'>Positivo</font>**"
+    elif sent == 'POS':
+        color_response="**<font color='green'>Positivo</font>**"
     else:
-        color_response="**<font color='red'>Neutro</font>**"
-    return f"El texto es: {color_response} con una probabilidad de {max_probabilidad*100:.2f}%.", fig
+        color_response="**<font color='grey'>Neutro</font>**"
+    resp=f"El texto es: {color_response} con una probabilidad de {max_prob*100:.2f}%."
 
+    return resp, fig
+    
+def hate_analisys(text):
+    # Preprocess text
+    text_words=[]
+    for word in text.split(' '):
+        if word.startswith('@') and len(word)>1:
+            word='@user'
+        elif word.startswith('http'):
+            word='http'
+        text_words.append(word)
+    full_text= ' '.join(text_words)
+    
+    hate_analizer=load_analizers()[1]
+    
+    hate=hate_analizer.predict(full_text)
+    
+    #ejemplo de salida: AnalyzerOutput(output=[], probas={hateful: 0.022, targeted: 0.009, aggressive: 0.018})
+    
+    probs = hate.probas
+    hate = hate.output
+    
+    #labels = ['Odioso', 'Agresivo', 'Dirigido', 'No Odioso']
+    
+    probs_array = np.array(list(probs.values()))
+    max_prob=np.max(probs_array)
+        
+    # Etiquetas y valores
+    traduccion = {
+    'hateful': 'Odioso',
+    'aggressive': 'Agresivo',
+    'targeted': 'Dirigido'
+    }
+    df = pd.DataFrame({
+    'Etiqueta': [traduccion[k] for k in probs.keys()],
+    'Probabilidad': list(probs.values())
+    })
+    #df = pd.DataFrame(list(probs.items()), columns=['Etiqueta', 'Probabilidad'])
+    # Crear el gráfico de barras
+    fig = px.bar(df, x='Etiqueta', y='Probabilidad', color='Etiqueta', color_discrete_map={
+    'Odioso': '#FF0000',  # Rojo
+    'Agresivo': '#FF9900',  # Naranja
+    'Dirigido': '#FFFF00'  # Amarillo
+    })
+        # Dar una respuestas
+    resp=''
+    for clasificacion in hate:
+        if clasificacion == 'hateful':
+            color_response = "**<font color='red'>Odioso</font>**"
+        elif clasificacion == 'aggressive':
+            color_response = "**<font color='orange'>Agresivo</font>**"
+        elif clasificacion == 'targeted':
+            color_response = "**<font color='yellow'>Dirigido</font>**"
+        resp+=f"El texto es: {color_response} con una intensidad de {probs[clasificacion]*100:.2f}%. <br>"
+    if resp=='':
+        resp=f"El texto es: **<font color='green'>No odioso</font>**"
+    return resp, fig
+    
 
 # Main app logic
 def main():
     st.title("Procesamiento de Texto en Redes Sociales")
-
-    # Load model and tokenizer only once
-    model, tokenizer = load_model_Beto()
-
     # User input
-    option = st.selectbox("Elige una opción", ["Introducir texto para búsqueda"])
-    
-    if option == "Introducir texto para búsqueda":
+    option = st.selectbox("Elige una opción", ["Análisis de Sentimiento", "Detección de Odio"])
+
+    if option == "Análisis de Sentimiento":
         text_input = st.text_area("Escriba el texto para realizar el analisis de sentimiento")
         if st.button("Analizar Sentimiento"):
-            sentiment,confidence, fig = predict_sentiment(text_input, model, tokenizer)
-            #exp=explain_sentiment(text_input, model, tokenizer)
-            st.markdown(sentiment, unsafe_allow_html=True)
-            st.markdown(confidence, unsafe_allow_html=True)
-            #st.markdown(exp)
+            resp, fig=sentiment_analisys(text_input)
+            st.markdown(resp, unsafe_allow_html=True)
             with st.container():
                 st.write("### Distribución de Sentimientos")
                 st.plotly_chart(fig, use_container_width=True)
-
+    elif option == "Detección de Odio":             
+        text_input = st.text_area("Escriba el texto para relizar detección de Odio") 
+        if st.button("Analizar Odio"):
+            resp, fig=hate_analisys(text_input)  
+            st.markdown(resp, unsafe_allow_html=True)
+            with st.container():
+                st.write("### Distribución de Sentimientos")
+                st.plotly_chart(fig, use_container_width=True)
 
 if __name__ == "__main__":
     main()

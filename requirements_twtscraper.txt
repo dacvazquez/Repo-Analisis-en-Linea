@@ -1,0 +1,8 @@
+streamlit
+transformers==4.40.2
+tensorflow==2.16.1
+tweetnlp
+selenium==4.20.0
+seleniumbase
+webdriver-manager
+
