@@ -4,7 +4,4 @@ torch
 numpy
 scipy
 plotly
-tweetnpl
-wheel
-lime
-captum
+tweepy
