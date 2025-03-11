@@ -127,7 +127,7 @@ def main():
     st.title("Procesamiento de Texto en Redes Sociales")
     # User input
     option = st.selectbox("Elige una opción", ["Análisis de Sentimiento", "Detección de Odio"])
-
+    st.markdown("<br>", unsafe_allow_html=True)
     if option == "Análisis de Sentimiento":
         text_input = st.text_area("Escriba el texto para realizar el analisis de sentimiento")
         if st.button("Analizar Sentimiento"):
@@ -139,7 +139,8 @@ def main():
     elif option == "Detección de Odio":             
         text_input = st.text_area("Escriba el texto para relizar detección de Odio") 
         if st.button("Analizar Odio"):
-            resp, fig=hate_analisys(text_input)  
+            resp, fig=hate_analisys(text_input) 
+            #st.success("Buscar los demas", icon="👍")
             st.markdown(resp, unsafe_allow_html=True)
             with st.container():
                 st.write("### Distribución de Sentimientos")
