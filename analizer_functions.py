@@ -22,8 +22,8 @@ def sentiment_analisys(text,sentiment_analyzer):
     sentimiento=sentiment_analyzer.predict(full_text)
     #ejemplo de salida: AnalyzerOutput(output=POS, probas={POS: 0.857, NEU: 0.103, NEG: 0.040})
     
-    probs = sentimiento.probas
-    sent = sentimiento.output
+    probs = sentimiento.probas #Probabilidades
+    sent = sentimiento.output #POS, NEG o NEU
     
     probs_array = np.array(list(probs.values()))
     max_prob=np.max(probs_array)
@@ -33,16 +33,8 @@ def sentiment_analisys(text,sentiment_analyzer):
                              textinfo='label+percent', textposition='inside',
                              marker_colors=colores)])
    
-        # Dar una respuestas
-    if sent == 'NEG':
-        color_response="**<font color='red'>Negativo</font>**"
-    elif sent == 'POS':
-        color_response="**<font color='green'>Positivo</font>**"
-    else:
-        color_response="**<font color='grey'>Neutro</font>**"
-    resp=f"El texto es: {color_response} con una probabilidad de {max_prob*100:.2f}%."
 
-    return resp, fig
+    return sent, max_prob*100, fig
     
 def hate_analisys(text, hate_analizer):
     # Preprocess text
@@ -65,7 +57,7 @@ def hate_analisys(text, hate_analizer):
     #labels = ['Odioso', 'Agresivo', 'Dirigido', 'No Odioso']
     
     probs_array = np.array(list(probs.values()))
-    max_prob=np.max(probs_array)
+    #max_prob=np.max(probs_array)
         
     # Etiquetas y valores
     traduccion = {
@@ -77,6 +69,7 @@ def hate_analisys(text, hate_analizer):
     'Etiqueta': [traduccion[k] for k in probs.keys()],
     'Intensidad': list(probs.values())
     })
+    
     #df = pd.DataFrame(list(probs.items()), columns=['Etiqueta', 'Probabilidad'])
     # Crear el gráfico de barras
     fig = px.bar(df, x='Etiqueta', y='Intensidad', color='Etiqueta', color_discrete_map={
@@ -93,8 +86,8 @@ def hate_analisys(text, hate_analizer):
             color_response = "**<font color='orange'>Agresivo</font>**"
         elif clasificacion == 'targeted':
             color_response = "**<font color='yellow'>Dirigido</font>**"
-        resp+=f"El texto es: {color_response} con una intensidad de {probs[clasificacion]*100:.2f}%. <br>"
+        resp+=f"El texto es: {color_response} con un rating de {probs[clasificacion]*100:.2f}%. <br>"
     if resp=='':
         resp=f"El texto es: **<font color='green'>No odioso</font>**"
-    return resp, fig
+    return hate, probs, fig
     
