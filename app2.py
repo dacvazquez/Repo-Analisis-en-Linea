@@ -1,160 +1,88 @@
-import streamlit as st
-from transformers import pipeline
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import numpy as np
-from scipy.special import softmax
-import plotly.graph_objects as go
-from lime.lime_text import LimeTextExplainer
-import torch
-import pandas as pd
-import plotly.express as px
-import matplotlib.pyplot as plt
-from pysentimiento import create_analyzer
-from analizer_functions import sentiment_analisys, hate_analisys
-from testing_scraper import get_tweets_and_replies
 
-@st.cache_resource
-def load_analizers():
-    
-    # Para análisis de sentimiento
-    sentiment_analyzer = create_analyzer(task="sentiment", lang="es")
-    
-    # Para detección de discurso de odio
-    hate_analizer = create_analyzer(task="hate_speech", lang="es")
-
-    return sentiment_analyzer, hate_analizer
-
-# Main app logic
-import streamlit as st
-
-def main():
-    st.title("Procesamiento de Texto en Redes Sociales")
-
-    # Inicializar el estado de la sesión si no existe
-    if 'opcion_actual' not in st.session_state:
-        st.session_state['opcion_actual'] = "Analisis de Texto"  # Opción por defecto
-
-    if 'tweets_data' not in st.session_state:
-        st.session_state['tweets_data'] = None  # Almacenar los tweets obtenidos
-
-    if 'text_input_sentimiento' not in st.session_state:
-        st.session_state['text_input_sentimiento'] = ""  # Almacenar el texto para análisis de sentimiento
-
-    if 'text_input_odio' not in st.session_state:
-        st.session_state['text_input_odio'] = ""  # Almacenar el texto para detección de odio
-
-    if 'sentiment_analysis_result' not in st.session_state:
-        st.session_state['sentiment_analysis_result'] = None  # Almacenar el resultado del análisis de sentimiento
-
-    if 'hate_analysis_result' not in st.session_state:
-        st.session_state['hate_analysis_result'] = None  # Almacenar el resultado de la detección de odio
-
-    # Sidebar para la navegación
-    with st.sidebar:
-        st.header("Navegación")
-        opcion = st.radio(
-            "Selecciona una opción:",
-            ("Analisis de Texto", "Obtener Tweets"),
-            key='opcion_radio'
-        )
-
-    # Actualizar el estado de la opción actual
-    if opcion != st.session_state['opcion_actual']:
-        st.session_state['opcion_actual'] = opcion
-    
-    # Lógica para cada opción
-    
-    if st.session_state['opcion_actual'] == "Obtener Tweets":
-        st.header("Obtener Tweets de un Usuario")
-        st.write("ID de usuario de la universidad: 2277112266")
-
-        # Entrada de usuario
-        if 'user_input' not in st.session_state:    
-            st.session_state['user_input'] = st.text_input("Ingresa el ID de usuario o @usuario:")
-            st.number_input("Cantidad de tweets a visualizar:", min_value=1, max_value=20, value=10)
-        else:
-            user_input=st.session_state['user_input']
-            st.number_input("Cantidad de tweets a visualizar:", min_value=1, max_value=20, value=10)
+    if opcion == "Analizar Varios":
+        st.header("Análisis Múltiple de Textos")
+        
+        # Opciones para importar/exportar en pestañas para ahorrar espacio
+        tab1, tab2, tab3 = st.tabs(["Añadir Texto", "Importar/Exportar", "Ver Resultados"])
+        
+        with tab1:
+            st.subheader("Añadir Nuevo Texto")
+            new_text = st.text_area("Ingrese el texto a analizar", key="new_text_input")
+            if st.button("Analizar y Añadir"):
+                if new_text:
+                    with st.spinner('Analizando texto...'):
+                        # Usar la función optimizada con caché
+                        sentiment_result, hate_result = analyze_text(new_text, sentiment_analyzer, hate_analizer)
+                    
+                    # Añadir al DataFrame
+                    new_row = pd.DataFrame({
+                        'Texto': [new_text],
+                        'Análisis de Sentimiento': [sentiment_result],
+                        'Análisis de Odio': [hate_result]
+                    })
+                    st.session_state.analysis_df = pd.concat([st.session_state.analysis_df, new_row], ignore_index=True)
+                    st.success("Texto analizado y añadido correctamente")
+                    # Limpiar el campo de texto
+                    st.session_state.new_text_input = ""
+                    # Forzar el rerun para mostrar el DataFrame actualizado
+                    st.experimental_rerun()
+                else:
+                    st.warning("Por favor, ingrese un texto para analizar")
+        
+        with tab2:
+            col1, col2 = st.columns(2)
             
+            with col1:
+                st.subheader("Importar Datos")
+                uploaded_file = st.file_uploader("Sube un archivo CSV", type=['csv'])
+                if uploaded_file is not None:
+                    try:
+                        df = pd.read_csv(uploaded_file)
+                        if all(col in df.columns for col in ['Texto', 'Análisis de Sentimiento', 'Análisis de Odio']):
+                            st.session_state.analysis_df = df
+                            st.success("Archivo importado correctamente")
+                        else:
+                            st.error("El archivo debe contener las columnas: Texto, Análisis de Sentimiento, Análisis de Odio")
+                    except Exception as e:
+                        st.error(f"Error al importar el archivo: {str(e)}")
             
-        # Botón para ejecutar la búsqueda
-        if st.button("Buscar Tweets"):
-            if user_input:
-                # Limpiar la entrada del usuario (eliminar @ si está presente)
-                user_id = user_input.replace("@", "").strip()
-
-                # Obtener los tweets y comentarios (simulado)
-                st.session_state['tweets_data'] = get_tweets_and_replies(user_input, 10)
-
-                if st.session_state['tweets_data']:
-                    st.success("Datos obtenidos correctamente.")
-                    #st.write("### Vista previa de los datos:")
-                    #st.dataframe(st.session_state['tweets_data'])
-
-                    # Exportar a CSV (simulado)
-                    csv = "ID,Texto,Creado el,Likes\n1,Este es un tweet de ejemplo,2023-10-01,10\n2,Otro tweet de ejemplo,2023-10-02,20"
+            with col2:
+                st.subheader("Exportar Datos")
+                if not st.session_state.analysis_df.empty:
+                    csv = st.session_state.analysis_df.to_csv(index=False).encode('utf-8')
                     st.download_button(
                         label="Descargar como CSV",
                         data=csv,
-                        file_name=f"tweets_{user_id}.csv",
+                        file_name="analisis_textos.csv",
                         mime="text/csv"
                     )
                 else:
-                    st.warning("No se encontraron tweets o comentarios.")
+                    st.info("No hay datos para exportar")
+            
+            # Opción para limpiar el DataFrame
+            if st.button("Limpiar Todos los Resultados"):
+                st.session_state.analysis_df = pd.DataFrame(columns=['Texto', 'Análisis de Sentimiento', 'Análisis de Odio'])
+                st.success("Resultados limpiados correctamente")
+        
+        with tab3:
+            st.subheader("Resultados del Análisis")
+            if not st.session_state.analysis_df.empty:
+                # Usar paginación si hay muchos registros
+                page_size = 10
+                total_pages = (len(st.session_state.analysis_df) - 1) // page_size + 1
+                
+                if total_pages > 1:
+                    page = st.number_input(
+                        f"Página (1-{total_pages})", 
+                        min_value=1, 
+                        max_value=total_pages, 
+                        value=1
+                    )
+                    start_idx = (page - 1) * page_size
+                    end_idx = min(start_idx + page_size, len(st.session_state.analysis_df))
+                    st.dataframe(st.session_state.analysis_df.iloc[start_idx:end_idx])
+                    st.text(f"Mostrando {start_idx+1}-{end_idx} de {len(st.session_state.analysis_df)} registros")
+                else:
+                    st.dataframe(st.session_state.analysis_df)
             else:
-                st.warning("Por favor, ingresa un ID de usuario o @usuario.")
-
-    elif st.session_state['opcion_actual'] == "Analisis de Texto":
-        # Cargar analizadores (simulado)
-        sentiment_analyzer, hate_analyzer = load_analizers()
-
-        # User input
-        option = st.selectbox("Elige una opción", ["Análisis de Sentimiento", "Detección de Odio"], key='option')
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        if option == "Análisis de Sentimiento":
-            text_input = st.text_area(
-                "Escriba el texto para realizar el análisis de sentimiento",
-                value=st.session_state['text_input_sentimiento'],
-                key='text_input_sentimiento'
-            )
-            if st.button("Analizar Sentimiento"):
-                resp, fig = sentiment_analisys(text_input, sentiment_analyzer)
-                st.session_state['sentiment_analysis_result'] = (resp, fig)
-                st.markdown(resp, unsafe_allow_html=True)
-                with st.container():
-                    st.write("### Distribución de Sentimientos")
-                    st.plotly_chart(fig, use_container_width=True)
-
-            # Mostrar resultado anterior si existe
-            if st.session_state['sentiment_analysis_result']:
-                resp, fig = st.session_state['sentiment_analysis_result']
-                st.markdown(resp, unsafe_allow_html=True)
-                with st.container():
-                    st.write("### Distribución de Sentimientos (Anterior)")
-                    st.plotly_chart(fig, use_container_width=True)
-
-        elif option == "Detección de Odio":
-            text_input = st.text_area(
-                "Escriba el texto para realizar detección de Odio",
-                value=st.session_state['text_input_odio'],
-                key='text_input_odio'
-            )
-            if st.button("Analizar Odio"):
-                resp, fig = hate_analisys(text_input, hate_analyzer)
-                st.session_state['hate_analysis_result'] = (resp, fig)
-                st.markdown(resp, unsafe_allow_html=True)
-                with st.container():
-                    st.write("### Distribución de Sentimientos")
-                    st.plotly_chart(fig, use_container_width=True)
-
-            # Mostrar resultado anterior si existe
-            if st.session_state['hate_analysis_result']:
-                resp, fig = st.session_state['hate_analysis_result']
-                st.markdown(resp, unsafe_allow_html=True)
-                with st.container():
-                    st.write("### Distribución de Sentimientos (Anterior)")
-                    st.plotly_chart(fig, use_container_width=True)
-
-if __name__ == "__main__":
-    main()
+                st.info("No hay datos para mostrar. Añade textos para analizarlos.")

@@ -327,10 +327,17 @@ def main():
             with col1:
                 st.markdown("#### Distribución de Sentimientos")
                 st.markdown("<br>", unsafe_allow_html=True)
+                # Definir colores para sentimientos
+                sentiment_colors = {
+                    'POS': '#2ecc71',  # Verde
+                    'NEU': '#95a5a6',  # Gris
+                    'NEG': '#e74c3c'   # Rojo
+                }
                 fig_sentiment = go.Figure(data=[go.Pie(
                     labels=sentiment_counts.index,
                     values=sentiment_counts.values,
-                    hole=.3
+                    hole=.3,
+                    marker=dict(colors=[sentiment_colors.get(label, '#3498db') for label in sentiment_counts.index])
                 )])
                 fig_sentiment.update_layout(height=400, margin=dict(t=20, b=20, l=20, r=20))
                 st.plotly_chart(fig_sentiment, use_container_width=True)
@@ -338,10 +345,17 @@ def main():
             with col2:
                 st.markdown("#### Distribución de Tipos de Odio")
                 st.markdown("<br>", unsafe_allow_html=True)
+                # Definir colores para tipos de odio
+                hate_colors = {
+                    'hateful': '#e74c3c',    # Rojo
+                    'aggressive': '#f39c12',  # Naranja
+                    'targeted': '#9b59b6'     # Púrpura
+                }
                 fig_hate = go.Figure(data=[go.Pie(
                     labels=list(hate_counts.keys()),
                     values=list(hate_counts.values()),
-                    hole=.3
+                    hole=.3,
+                    marker=dict(colors=[hate_colors.get(label, '#3498db') for label in hate_counts.keys()])
                 )])
                 fig_hate.update_layout(height=400, margin=dict(t=20, b=20, l=20, r=20))
                 st.plotly_chart(fig_hate, use_container_width=True)
