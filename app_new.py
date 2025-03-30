@@ -77,7 +77,7 @@ def main():
                     st.dataframe(df)
 
                     # Exportar a CSV
-                    csv = df.to_csv(index=False).encode('utf-8')
+                    csv = df.to_csv(index=False).encode('utf-8-sig')
                     st.download_button(
                         label="Descargar como CSV",
                         data=csv,
@@ -96,7 +96,7 @@ def main():
             text_input = st.text_area("Escriba el texto para realizar el analisis de sentimiento")
             if st.button("Analizar Sentimiento"):
                 with st.spinner('Analizando sentimiento...'):
-                    resp, fig = sentiment_analisys(text_input, sentiment_analyzer)
+                    resp, prob, fig = sentiment_analisys(text_input, sentiment_analyzer)
                 st.markdown(resp, unsafe_allow_html=True)
                 with st.container():
                     st.write("### Distribución de Sentimientos")
