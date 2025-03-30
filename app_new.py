@@ -235,7 +235,7 @@ def main():
             dominant_sentiment = sentiment_counts.index[0]
             
             # Calcular porcentajes de sentimientos
-            sentiment_percentages = (sentiment_counts / total_texts * 100).round(1)
+            sentiment_percentages = (sentiment_counts / total_texts * 100).apply(lambda x: round(x, 1))
             
             # Calcular métricas de odio
             hate_counts = {'hateful': 0, 'aggressive': 0, 'targeted': 0}
@@ -246,11 +246,11 @@ def main():
                         hate_counts[hate_type] += 1
                         total_hate += 1
             
-            # Calcular longitud promedio de textos
-            avg_text_length = st.session_state.analysis_df['Texto'].str.len().mean().round(1)
+            # Longitud promedio de textos
+            avg_text_length = round(st.session_state.analysis_df['Texto'].str.len().mean(), 1)
             
-            # Calcular tasa de odio
-            hate_rate = (total_hate / total_texts * 100).round(1)
+            # Tasa de odio
+            hate_rate = round((total_hate / total_texts * 100), 1)
             
             # Primera fila: Métricas básicas
             col1, col2, col3 = st.columns(3)
@@ -269,12 +269,15 @@ def main():
                 dominant_hate = max(hate_counts.items(), key=lambda x: x[1])[0]
                 st.markdown("#### ⚠️ Análisis de Odio")
                 st.metric("Tipo de Odio Dominante", dominant_hate)
-                st.metric("Tasa de Odio", f"{hate_rate}%")
+                # Mostrar tasas individuales para cada tipo de odio
+                for hate_type, count in hate_counts.items():
+                    rate = round((count / total_texts * 100), 1)
+                    st.metric(f"Tasa de {hate_type}", f"{rate}%")
             
             # Segunda fila: Métricas detalladas
             st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("### Métricas Detalladas")
             st.markdown("---")
+            st.markdown("### Métricas Detalladas")
             
             col1, col2, col3 = st.columns(3)
             
@@ -290,7 +293,7 @@ def main():
             with col2:
                 st.markdown("#### 🎯 Tipos de Odio")
                 for hate_type, count in hate_counts.items():
-                    percentage = (count / total_texts * 100).round(1)
+                    percentage = round((count / total_texts * 100), 1)
                     st.metric(
                         f"Tipo {hate_type}",
                         f"{percentage}%",
@@ -315,6 +318,7 @@ def main():
             st.markdown("<br>", unsafe_allow_html=True)
             
             # Segunda fila: Gráficos de distribución
+            
             st.markdown("---")
             st.markdown("### Distribuciones")
             st.markdown("<br>", unsafe_allow_html=True)
