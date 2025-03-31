@@ -1,4 +1,5 @@
 streamlit
+streamlit-elements==0.1.*
 transformers
 torch
 numpy
@@ -7,3 +8,4 @@ plotly
 tweepy
 wordcloud
 matplotlib
+nltk

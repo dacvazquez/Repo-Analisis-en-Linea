@@ -7,12 +7,51 @@ from testing_scraper import get_tweets_and_replies
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import numpy as np
+from nltk.corpus import stopwords
+import nltk
+
+# Download required NLTK data
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
 
 # Configurar el ancho máximo de la página (debe ser la primera llamada de Streamlit)
 st.set_page_config(
     layout="wide",
+    page_title="Análisis de Comportamiento Transgresivo en Redes Sociales",
     page_icon="Icons/eye.svg"
     )
+
+# Añadir CSS personalizado para la barra lateral
+st.markdown("""
+    <style>
+    .stRadio > div {
+        margin-left: 20px;
+    }
+    #root > div:nth-child(1) > div.withScreencast > div > div > section.stSidebar.st-emotion-cache-1wqrzgl.e1tphpha0 > div.st-emotion-cache-6qob1r.e1tphpha8 > div.st-emotion-cache-a6qe2i.e1tphpha7 > div > div > div > div > div:nth-child(2) > div > label > div > p{
+        font-size: 20px;
+        text-align: center;
+    }
+    button[kind="borderlessIconActive"]{
+        margin: 5px 15px;
+        margin-bottom: 10px;
+    }
+    button[kind="borderlessIcon"]{
+        margin: 0px 15px;
+    }
+    .stRadio label {
+        font-size: 18px !important;
+        padding: 5px;
+        margin: 10px 0;
+    }
+    .stRadio > label {
+        font-size: 10px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+
 
 # Inicializar session_state
 if 'analysis_df' not in st.session_state:
@@ -46,12 +85,17 @@ def main():
     sentiment_analyzer, hate_analizer = load_analizers()
     
     with st.sidebar:
-        st.header("Navegación")
+        st.write("# Navegación")
         opcion = st.radio(
-            "Selecciona una opción:",
-            ("Analisis de Texto", "Obtener Tweets", "Analizar Varios", "Análisis de Datos")
+            label="Selecciona una opción:",
+            options=("Analisis de Texto", "Obtener Tweets", "Analizar Varios", "Análisis de Datos"),
+            captions=("Analizar el sentimiento y el odio de un texto específico", 
+                      "Para obtener Tweets de un usuario específico", 
+                      "Para analizar varios textos a la vez y visualizar los resultados en un dataframe", 
+                      "Para observar los análisis cuantitativos y cualitativos sobre los textos almacenados en el dataframe")
         )
-        
+        if st.feedback("faces"):
+            st.success("### Gracias por su feedback",icon=":material/thumb_up:")
     if opcion == "Obtener Tweets":
         st.header("Obtener Tweets de un Usuario")
         st.write("ID de usuario de la universidad: 2277112266")
@@ -223,10 +267,10 @@ def main():
         st.header("Dashboard de Análisis")
         
         if st.session_state.analysis_df.empty:
-            st.warning("No hay datos para analizar. Por favor, analiza algunos textos primero.")
+            st.warning("No hay datos para analizar. Por favor, ingresa algunos textos primero.")
         else:
             # Primera fila: Métricas principales
-            st.markdown("---")  # Línea divisoria
+            st.divider()
             st.markdown("### Métricas Principales")
             
             # Calcular métricas adicionales
@@ -276,13 +320,13 @@ def main():
             
             # Segunda fila: Métricas detalladas
             st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("---")
-            st.markdown("### Métricas Detalladas")
+            st.divider()
+            st.markdown("### Métricas del Análisis")
             
             col1, col2, col3 = st.columns(3)
             
             with col1:
-                st.markdown("#### 📈 Distribución de Sentimientos")
+                st.markdown("#### 📈 Análisis de Sentimientos")
                 for sentiment, percentage in sentiment_percentages.items():
                     st.metric(
                         f"Sentimiento {sentiment}",
@@ -291,7 +335,7 @@ def main():
                     )
             
             with col2:
-                st.markdown("#### 🎯 Tipos de Odio")
+                st.markdown("#### 🎯 Análisis de Odio")
                 for hate_type, count in hate_counts.items():
                     percentage = round((count / total_texts * 100), 1)
                     st.metric(
@@ -303,11 +347,11 @@ def main():
             with col3:
                 st.markdown("#### 📝 Estadísticas de Texto")
                 st.metric(
-                    "Textos más largos",
+                    "Texto más largo",
                     f"{st.session_state.analysis_df['Texto'].str.len().max()} caracteres"
                 )
                 st.metric(
-                    "Textos más cortos",
+                    "Texto más corto",
                     f"{st.session_state.analysis_df['Texto'].str.len().min()} caracteres"
                 )
                 st.metric(
@@ -319,7 +363,7 @@ def main():
             
             # Segunda fila: Gráficos de distribución
             
-            st.markdown("---")
+            st.divider()
             st.markdown("### Distribuciones")
             st.markdown("<br>", unsafe_allow_html=True)
             col1, col2 = st.columns(2)
@@ -364,48 +408,79 @@ def main():
             st.markdown("<br>", unsafe_allow_html=True)
             
             # Tercera fila: Nube de palabras
-            st.markdown("---")  # Línea divisoria
-            st.markdown("### Análisis de Palabras")
+            st.divider()
+            st.markdown("### Nube de Palabras")
             st.markdown("<br>", unsafe_allow_html=True)
             
             col1, col2 = st.columns([3, 1])
             
-            with col1:
+        
+            # Combinar todos los textos
+            all_text = ' '.join(st.session_state.analysis_df['Texto'])
+            
+            # Crear nube de palabras
+            wordcloud = WordCloud(
+                width=1200,
+                height=600,  
+                mode="RGBA",
+                background_color=None,
+                max_words=100,
+                max_font_size=150,
+                random_state=42,
+                collocations=False
+            ).generate(all_text)
+            
+            # Mostrar la nube de palabras
+            fig, ax = plt.subplots(figsize=(15, 8))  # Aumentado el tamaño
+            ax.imshow(wordcloud, interpolation='bilinear')
+            ax.axis('off')
+            st.pyplot(fig)
+        
+        
+            st.markdown("#### Opciones de Exportación")
+            # Guardar la imagen con fondo transparente
+            wordcloud.to_file("wordcloud_transparent.png")
+            
+            # Botón para descargar la imagen
+            with open("wordcloud_transparent.png", "rb") as file:
+                if st.download_button(
+                    label="📥 Descargar Nube de Palabras",
+                    data=file,
+                    file_name="wordcloud_transparent.png",
+                    mime="image/png"
+                ):
+                    st.success("✅ Nube de palabras guardada correctamente")
+            
+            # Botón para filtrar stopwords
+            if st.button("🔍 Filtrar Stopwords"):
+                # Obtener stopwords en español
+                spanish_stopwords = set(stopwords.words('spanish'))
+                
                 # Combinar todos los textos
                 all_text = ' '.join(st.session_state.analysis_df['Texto'])
                 
-                # Crear nube de palabras
+                # Crear nube de palabras con stopwords filtradas
                 wordcloud = WordCloud(
-                    width=1200,  # Aumentado el ancho
-                    height=600,  # Aumentado el alto
+                    width=1200,
+                    height=600,  
                     mode="RGBA",
                     background_color=None,
                     max_words=100,
                     max_font_size=150,
                     random_state=42,
-                    collocations=False
+                    collocations=False,
+                    stopwords=spanish_stopwords
                 ).generate(all_text)
                 
-                # Mostrar la nube de palabras
-                fig, ax = plt.subplots(figsize=(15, 8))  # Aumentado el tamaño
+                # Mostrar la nueva nube de palabras
+                fig, ax = plt.subplots(figsize=(15, 8))
                 ax.imshow(wordcloud, interpolation='bilinear')
                 ax.axis('off')
                 st.pyplot(fig)
-            
-            with col2:
-                st.markdown("#### Opciones de Exportación")
-                # Guardar la imagen con fondo transparente
-                wordcloud.to_file("wordcloud_transparent.png")
                 
-                # Botón para descargar la imagen
-                with open("wordcloud_transparent.png", "rb") as file:
-                    if st.download_button(
-                        label="📥 Descargar Nube de Palabras",
-                        data=file,
-                        file_name="wordcloud_transparent.png",
-                        mime="image/png"
-                    ):
-                        st.success("✅ Nube de palabras guardada correctamente")
+                # Guardar la nueva imagen
+                if wordcloud.to_file("wordcloud_transparent.png"):
+                    st.success("✅ Nube de palabras actualizada sin stopwords")
 
 if __name__ == "__main__":
     main()
