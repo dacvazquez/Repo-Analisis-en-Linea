@@ -11,7 +11,7 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 from pysentimiento import create_analyzer
 from analizer_functions import sentiment_analisys, hate_analisys
-from testing_scraper import get_tweets_and_replies
+from x_scraper import get_tweets_and_replies
 
 
 @st.cache_resource

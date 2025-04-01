@@ -4,17 +4,12 @@ import pandas as pd
 import streamlit as st
 
 # Credenciales de la API de Twitter
-BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAAPTfzQEAAAAAu9acGZjaTCeyNsiBEv%2BrURm%2FHhU%3DqEITh867kzHYwNIjPsTQgSzoG6lm9UgBb6CBdzTHNIufIKldYT"
-API_KEY = "eTnF2iZzw7oQLF4E4TaIsfavw"
-API_SECRET_KEY = "bPhEcnkUJ6hBcTiTqJ9QWw6Ism1uUqKUdeXYpIMWRFC4qvQpbY"
-ACCESS_TOKEN = "1520488576177299456-kjjoaZy5ZhskDG0R98ZgbdavYm4PTl"
-ACCESS_TOKEN_SECRET = "ahQhvazxfudKmnBSx0Cy91AhIEhDIxlGibKrN0DVJeNu0"
+BEARER_TOKEN = "PON AQUI TU TOKEN DE DESARROLLADOR"
 
 # Autenticación con la API v2
 client = tweepy.Client(bearer_token=BEARER_TOKEN)
-# ID de usuario de la universidad
-user_id = 2277112266
 
+# Crear una tarjeta para los parametros de un Tweet
 def create_card(id, text, created_at, like_count):
     card_html = f"""
     <div style="
@@ -34,8 +29,14 @@ def create_card(id, text, created_at, like_count):
     </div>
     """
     return card_html
+
+# funcion para obtener los tweets de un ID de usuario especifico 
+
 def get_tweets_and_replies(user_id, max_tweets):
     try:
+        # el ID de usuario se puede buscar con client.get_user(username=user_id)
+        # lo tengo comentado para no hacer request adicionales a la API 
+        # ya que tengo el plan gratuito de la misma y solo permite 500 cada 15 minutos
         
         #if f"{user_id}".isnumeric()==0:
             #user = client.get_user(username=user_id)

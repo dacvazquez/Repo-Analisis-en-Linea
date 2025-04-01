@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from pysentimiento import create_analyzer
 from analizer_functions import sentiment_analisys, hate_analisys
-from testing_scraper import get_tweets_and_replies
+from x_scraper import get_tweets_and_replies
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import numpy as np
@@ -51,7 +51,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
+captions=("Analizar el sentimiento y el odio de un texto específico", 
+          "Para obtener Tweets de un usuario específico", 
+          "Para analizar varios textos a la vez y visualizar los resultados en un dataframe", 
+          "Para observar los análisis cuantitativos y cualitativos sobre los textos almacenados en el dataframe")
 
 # Inicializar session_state
 if 'analysis_df' not in st.session_state:
@@ -77,7 +80,7 @@ def analyze_text(text, sentiment_analyzer, hate_analizer):
     
     return sentiment_result, hate_result
 
-# Main app logic
+
 def main():
     st.title("Procesamiento de Texto en Redes Sociales")
     
@@ -88,13 +91,10 @@ def main():
         st.write("# Navegación")
         opcion = st.radio(
             label="Selecciona una opción:",
-            options=("Analisis de Texto", "Obtener Tweets", "Analizar Varios", "Análisis de Datos"),
-            captions=("Analizar el sentimiento y el odio de un texto específico", 
-                      "Para obtener Tweets de un usuario específico", 
-                      "Para analizar varios textos a la vez y visualizar los resultados en un dataframe", 
-                      "Para observar los análisis cuantitativos y cualitativos sobre los textos almacenados en el dataframe")
+            options=("Analisis de Texto", "Obtener Tweets", "Analizar Varios", "Análisis de Datos")
         )
-        if st.feedback("faces"):
+        feed_level=st.feedback("faces")
+        if feed_level:
             st.success("### Gracias por su feedback",icon=":material/thumb_up:")
     if opcion == "Obtener Tweets":
         st.header("Obtener Tweets de un Usuario")
