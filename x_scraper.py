@@ -6,7 +6,7 @@ import streamlit as st
 # Credenciales de la API de Twitter
 
 # Autenticación con la API v2
-client = tweepy.Client(bearer_token=BEARER_TOKEN)
+client = tweepy.Client(bearer_token=st.secrets["BEARER_TOKEN"])
 
 # Crear una tarjeta para los parametros de un Tweet
 def create_card(id, text, created_at, like_count):
