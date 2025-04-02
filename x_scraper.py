@@ -4,7 +4,6 @@ import pandas as pd
 import streamlit as st
 
 # Credenciales de la API de Twitter
-BEARER_TOKEN = "PON AQUI TU TOKEN DE DESARROLLADOR"
 
 # Autenticación con la API v2
 client = tweepy.Client(bearer_token=BEARER_TOKEN)
@@ -15,7 +14,7 @@ def create_card(id, text, created_at, like_count):
     <div style="
         padding: 15px;
         border-radius: 10px;
-        margin: 10px 0;
+        margin: 10px 20px;
         border: 2px solid #1DA1F2;
         background-color: #15202B;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
