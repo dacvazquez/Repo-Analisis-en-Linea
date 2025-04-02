@@ -55,9 +55,6 @@ st.markdown("""
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        position: sticky;
-        top: 20px;
-        height: calc(100vh - 40px);
         overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: #888 #f0f2f6;
@@ -175,7 +172,7 @@ def main():
     
     with right_col:
         st.markdown("### 📊 Panel de Información")
-        # Aquí puedes agregar la imagen que desees mostrar
+        
         st.image("Icons/eye.svg", width=200)
         st.markdown("""
         ---
@@ -185,7 +182,6 @@ def main():
         - Estado del sistema
         """)
         
-        # Puedes agregar más contenido aquí como gráficos, métricas, etc.
         if 'analysis_df' in st.session_state and not st.session_state.analysis_df.empty:
             st.markdown("### 📊 Resumen de Datos")
             st.metric("Total de textos analizados", len(st.session_state.analysis_df))
@@ -200,9 +196,9 @@ def main():
             user_input = st.text_input("Ingresa el ID de usuario o @usuario:")
             max_tweets = st.number_input("Cantidad de tweets a visualizar:", min_value=1, max_value=20, value=10)
             
-            # Botón para ejecutar la búsqueda
             if st.button("Buscar Tweets"):
                 if user_input:
+                    
                     # Limpiar la entrada del usuario (eliminar @ si está presente)
                     user_id = user_input.replace("@", "").strip()
                     
@@ -255,8 +251,8 @@ def main():
                 text_input = st.text_area("Escriba el texto para relizar detección de Odio") 
                 if st.button("Analizar Odio"):
                     with st.spinner('Analizando discurso de odio...'):
-                        resp, fig = hate_analisys(text_input, hate_analizer) 
-                    st.markdown(resp, unsafe_allow_html=True)
+                        hate, hate_probs, fig = hate_analisys(text_input, hate_analizer) 
+                    st.markdown(hate, unsafe_allow_html=True)
                     with st.container():
                         st.write("### Distribución de Sentimientos")
                         st.plotly_chart(fig, use_container_width=True)
@@ -282,7 +278,7 @@ def main():
                     sentiment, prob_sentiment, fig_sentiment = sentiment_analisys(new_text, sentiment_analyzer)
                     hate, probs_hate, fig_hate = hate_analisys(new_text, hate_analizer)
                     
-                    #declarar color del sentimiento
+                    # Declarar color del sentimiento
                     if sentiment == 'NEG':
                         sentiment_response="**<font color='red'>Negativo</font>**"
                     elif sentiment == 'POS':
@@ -290,7 +286,7 @@ def main():
                     else:
                         sentiment_response="**<font color='grey'>Neutro</font>**"
                     
-                    #declarar color del Odio
+                    # Declarar color del Odio
                     resp=''
                     for clasification in hate:
                         if clasification == 'hateful':
@@ -522,7 +518,7 @@ def main():
                     width=1200,
                     height=600,  
                     mode="RGBA",
-                    background_color=None,
+                    background_color="black",
                     max_words=100,
                     max_font_size=150,
                     random_state=42,
@@ -537,15 +533,13 @@ def main():
             
             
                 st.markdown("#### Opciones de Exportación")
-                # Guardar la imagen con fondo transparente
-                wordcloud.to_file("wordcloud_transparent.png")
                 
                 # Botón para descargar la imagen
-                with open("wordcloud_transparent.png", "rb") as file:
+                with open("wordcloud.png", "rb") as file:
                     if st.download_button(
                         label="📥 Descargar Nube de Palabras",
                         data=file,
-                        file_name="wordcloud_transparent.png",
+                        file_name="wordcloud.png",
                         mime="image/png"
                     ):
                         st.success("✅ Nube de palabras guardada correctamente")
