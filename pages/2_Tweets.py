@@ -48,5 +48,5 @@ def main():
         else:
             st.warning("Por favor, ingresa un ID de usuario o @usuario.")
 
-if __name__ == "__main__":
-    main() 
+
+main() 

@@ -36,5 +36,5 @@ def main():
                 st.write("### Distribución de Sentimientos")
                 st.plotly_chart(fig, use_container_width=True)
 
-if __name__ == "__main__":
-    main() 
+
+main() 

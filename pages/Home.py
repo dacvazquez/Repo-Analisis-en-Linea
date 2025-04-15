@@ -15,14 +15,7 @@ try:
     nltk.data.find('corpora/stopwords')
 except LookupError:
     nltk.download('stopwords')
-
-# Configurar el ancho máximo de la página (debe ser la primera llamada de Streamlit)
-st.set_page_config(
-    layout="wide",
-    page_title="Análisis de Comportamiento Transgresivo en Redes Sociales",
-    page_icon="Icons/eye.svg"
-    )
-
+    
 # Añadir CSS personalizado para la barra lateral
 st.markdown("""
     <style>
@@ -158,7 +151,7 @@ def main():
     main_col, right_col = st.columns([7, 3])
     
     with main_col:
-        st.title("Procesamiento de Texto en Redes Sociales")
+        st.title("Deteccion de comportamiento transgresivo en redes sociales")
         
         # Cargar analizadores una sola vez
         sentiment_analyzer, hate_analizer = load_analizers()
@@ -181,5 +174,5 @@ def main():
             st.metric("Total de textos analizados", len(st.session_state.analysis_df))
             st.metric("Última Actualización", pd.Timestamp.now().strftime("%Y-%m-%d %H:%M"))
 
-if __name__ == "__main__":
-    main()
+
+main()

@@ -160,43 +160,45 @@ def main():
         st.markdown("### Nube de Palabras")
         st.markdown("<br>", unsafe_allow_html=True)
         
-        col1, col2 = st.columns([3, 1])
+        col1,col2 = st.columns([1, 1])
         
-        # Combinar todos los textos
-        all_text = ' '.join(st.session_state.analysis_df['Texto'])
-        
-        # Crear nube de palabras
-        wordcloud = WordCloud(
-            width=1200,
-            height=600,  
-            mode="RGBA",
-            background_color="black",
-            max_words=100,
-            max_font_size=150,
-            random_state=42,
-            collocations=False
-        ).generate(all_text)
-        
-        # Mostrar la nube de palabras
-        fig, ax = plt.subplots(figsize=(15, 8))
-        ax.imshow(wordcloud, interpolation='bilinear')
-        ax.axis('off')
-        st.pyplot(fig)
-        
-        st.markdown("#### Opciones de Exportación")
-        
-        # Botón para descargar la imagen
-        with open("wordcloud.png", "rb") as file:
-            if st.download_button(
-                label="📥 Descargar Nube de Palabras",
-                data=file,
-                file_name="wordcloud.png",
-                mime="image/png"
-            ):
-                st.toast("Nube de palabras guardada correctamente")
-        
+        with col1:
+            # Combinar todos los textos
+            all_text = ' '.join(st.session_state.analysis_df['Texto'])
+            
+            # Crear nube de palabras
+            wordcloud = WordCloud(
+                width=1400,
+                height=600,  
+                mode="RGBA",
+                background_color="black",
+                max_words=100,
+                max_font_size=150,
+                random_state=42,
+                collocations=False
+            ).generate(all_text)
+            
+            # Mostrar la nube de palabras
+            fig, ax = plt.subplots(figsize=(15, 8))
+            ax.imshow(wordcloud, interpolation='bilinear')
+            ax.axis('off')
+            st.pyplot(fig)
+            
+            st.markdown("#### Opciones de Exportación")
+            
+            # Botón para descargar la imagen
+            with open("wordcloud.png", "rb") as file:
+                if st.download_button(
+                    label="📥 Descargar Nube de Palabras",
+                    data=file,
+                    file_name="wordcloud.png",
+                    mime="image/png"
+                ):
+                    st.toast("Nube de palabras guardada correctamente")
+            
         # Botón para filtrar stopwords
         if st.button("🔍 Filtrar Stopwords"):
+           with col2:
             # Obtener stopwords en español
             spanish_stopwords = set(stopwords.words('spanish'))
             
@@ -205,7 +207,7 @@ def main():
             
             # Crear nube de palabras con stopwords filtradas
             wordcloud = WordCloud(
-                width=1200,
+                width=1400,
                 height=600,  
                 mode="RGBA",
                 background_color=None,
@@ -226,5 +228,5 @@ def main():
             if wordcloud.to_file("wordcloud_transparent.png"):
                 st.toast("Nube de palabras actualizada sin stopwords")
 
-if __name__ == "__main__":
-    main() 
+
+main() 
