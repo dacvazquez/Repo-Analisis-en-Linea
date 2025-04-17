@@ -8,3 +8,7 @@ nltk>=3.8.0
 numpy>=1.24.0 
 tweepy
 tiktokapi
+instaloader
+facebook_scraper
+time
+re
