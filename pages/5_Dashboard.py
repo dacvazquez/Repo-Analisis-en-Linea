@@ -15,6 +15,7 @@ except LookupError:
 def main():
     st.title("Dashboard de Análisis")
     
+    
     if 'analysis_df' not in st.session_state or st.session_state.analysis_df.empty:
         st.warning("No hay datos para analizar. Por favor, ingresa algunos textos primero.")
     else:
@@ -31,13 +32,12 @@ def main():
         sentiment_percentages = (sentiment_counts / total_texts * 100).apply(lambda x: round(x, 1))
         
         # Calcular métricas de odio
-        hate_counts = {'hateful': 0, 'aggressive': 0, 'targeted': 0}
-        total_hate = 0
-        for hate_list in st.session_state.analysis_df['Análisis de Odio']:
-            for hate_type in hate_counts.keys():
-                if hate_type in hate_list:
-                    hate_counts[hate_type] += 1
-                    total_hate += 1
+        hate_counts = {
+            'hateful': st.session_state.analysis_df['Odio'].sum(),
+            'aggressive': st.session_state.analysis_df['Agresividad'].sum(),
+            'targeted': st.session_state.analysis_df['Objetivismo'].sum()
+        }
+        total_hate = sum(hate_counts.values())
         
         # Longitud promedio de textos
         avg_text_length = round(st.session_state.analysis_df['Texto'].str.len().mean(), 1)
@@ -70,6 +70,7 @@ def main():
         # Segunda fila: Métricas detalladas
         st.markdown("<br>", unsafe_allow_html=True)
         st.divider()
+
         st.markdown("### Métricas del Análisis")
         
         col1, col2, col3 = st.columns(3)
@@ -121,9 +122,9 @@ def main():
             st.markdown("<br>", unsafe_allow_html=True)
             # Definir colores para sentimientos
             sentiment_colors = {
-                'POS': '#2ecc71',  # Verde
-                'NEU': '#95a5a6',  # Gris
-                'NEG': '#e74c3c'   # Rojo
+                'Positivo': '#2ecc71',  # Verde
+                'Neutro': '#95a5a6',    # Gris
+                'Negativo': '#e74c3c'   # Rojo
             }
             fig_sentiment = go.Figure(data=[go.Pie(
                 labels=sentiment_counts.index,
@@ -152,7 +153,6 @@ def main():
             fig_hate.update_layout(height=400, margin=dict(t=20, b=20, l=20, r=20))
             st.plotly_chart(fig_hate, use_container_width=True)
         
-        # Espaciador
         st.markdown("<br>", unsafe_allow_html=True)
         
         # Tercera fila: Nube de palabras

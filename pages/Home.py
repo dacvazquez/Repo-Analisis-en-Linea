@@ -152,7 +152,9 @@ def main():
     
     with main_col:
         st.title("Deteccion de comportamiento transgresivo en redes sociales")
-        
+        with open('textoIntro.txt', "r", encoding="utf-8") as file:
+            contenido = file.read() 
+        st.text_area("Texto", contenido, height=600)
         # Cargar analizadores una sola vez
         sentiment_analyzer, hate_analizer = load_analizers()
         

@@ -14,7 +14,28 @@ def main():
     
     # Inicializar DataFrame en session_state si no existe
     if 'analysis_df' not in st.session_state:
-        st.session_state.analysis_df = pd.DataFrame(columns=['Texto', 'Análisis de Sentimiento', 'Análisis de Odio'])
+        st.session_state.analysis_df = pd.DataFrame(columns=[
+            'Texto', 
+            'Análisis de Sentimiento',
+            'Odio',
+            'Agresividad',
+            'Objetivismo'
+        ])
+    
+    # Inicializar resultados del análisis si no existen
+    if 'last_analysis_results' not in st.session_state:
+        st.session_state.last_analysis_results = None
+    
+    # Mostrar toast si existe en session_state
+    if 'show_toast' in st.session_state:
+        st.toast(st.session_state.show_toast)
+        del st.session_state.show_toast
+    
+    # Mostrar resultados del último análisis si existen
+    if st.session_state.last_analysis_results:
+        sentiment_result, hate_result = st.session_state.last_analysis_results
+        st.write(sentiment_result, unsafe_allow_html=True)
+        st.write(hate_result, unsafe_allow_html=True)
     
     # Cargar analizadores
     sentiment_analyzer, hate_analizer = load_analizers()
@@ -42,40 +63,48 @@ def main():
             
             # Declarar color del Odio
             resp=''
+            hateful = False
+            aggressive = False
+            targeted = False
+            
             for clasification in hate:
                 if clasification == 'hateful':
+                    hateful = True
                     hate_response = "**<font color='red'>Odioso</font>**"
                 elif clasification == 'aggressive':
+                    aggressive = True
                     hate_response = "**<font color='orange'>Agresivo</font>**"
                 elif clasification == 'targeted':
+                    targeted = True
                     hate_response = "**<font color='yellow'>Dirigido</font>**"
+                elif clasification == 'none':
+                    hate_response = "**<font color='green'>No odioso</font>**"
                 resp+=f"El texto es: {hate_response} con un rating de {probs_hate[clasification]*100:.2f}%. <br>"
             if resp=='':
                 resp=f"El texto es: **<font color='green'>No odioso</font>**"
 
-            # Desplegar resultados
-            try:
-                sentiment_result =f"El sentimiento es {sentiment_response} con una intensidad de {prob_sentiment:.2f}"
-                st.write(sentiment_result, unsafe_allow_html=True)
-                st.write(resp, unsafe_allow_html=True)
-            except Exception as e:
-                st.write(e) 
+            # Guardar resultados para mostrar después del rerun
+            sentiment_result = f"El sentimiento es {sentiment_response} con una intensidad de {prob_sentiment:.2f}"
+            st.session_state.last_analysis_results = (sentiment_result, resp)
                 
             # Añadir al DataFrame
             new_row = pd.DataFrame({
                 'Texto': [new_text],
                 'Análisis de Sentimiento': [sentiment],
-                'Análisis de Odio': [hate]
+                'Odio': [hateful],
+                'Agresividad': [aggressive],
+                'Objetivismo': [targeted]
             })
             st.session_state.analysis_df = pd.concat([st.session_state.analysis_df, new_row], ignore_index=True)
-            st.toast("Texto analizado y añadido correctamente 👍")
+            st.session_state.show_toast = "Texto analizado y añadido correctamente 👍"
+            st.rerun()
         else:
             st.warning("Por favor, ingrese un texto para analizar")
             
     # Mostrar DataFrame existente
     if not st.session_state.analysis_df.empty:
         st.subheader("Resultados del Análisis")
-        st.dataframe(st.session_state.analysis_df)
+        st.write(st.session_state.analysis_df)
         
     # Opciones para importar
     st.subheader("Importar Datos")
@@ -83,18 +112,28 @@ def main():
     if uploaded_file is not None:
         try:
             df = pd.read_csv(uploaded_file)
-            if all(col in df.columns for col in ['Texto', 'Análisis de Sentimiento', 'Análisis de Odio']):
+            required_columns = ['Texto', 'Análisis de Sentimiento', 'Odio (hateful)', 'Agresividad (aggressive)', 'Objetivismo (targeted)']
+            if all(col in df.columns for col in required_columns):
                 st.session_state.analysis_df = df
-                st.toast("Archivo importado correctamente")
+                st.session_state.show_toast = "Archivo importado correctamente 👍"
+                st.rerun()
             else:
-                st.error("El archivo debe contener las columnas: Texto, Análisis de Sentimiento, Análisis de Odio")
+                st.error(f"El archivo debe contener las columnas: {', '.join(required_columns)}")
         except Exception as e:
             st.error(f"Error al importar el archivo: {str(e)}")
 
     # Opción para limpiar el DataFrame
     if st.button("Limpiar Todos los Resultados :wastebasket:"):
-        st.session_state.analysis_df = pd.DataFrame(columns=['Texto', 'Análisis de Sentimiento', 'Análisis de Odio'])
-        st.toast("Resultados limpiados correctamente")
+        st.session_state.analysis_df = pd.DataFrame(columns=[
+            'Texto', 
+            'Análisis de Sentimiento',
+            'Odio',
+            'Agresividad',
+            'Objetivismo'
+        ])
+        st.session_state.last_analysis_results = None
+        st.session_state.show_toast = "Resultados limpiados correctamente"
+        st.rerun()
 
 
 main() 
