@@ -9,5 +9,5 @@ numpy>=2.0.0
 tweepy>=4.15.0
 instaloader>=4.14.1
 facebook-scraper==0.2.59
-lxml>=4.9.0
+lxml-html-clean
 tiktokapi
