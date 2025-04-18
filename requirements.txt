@@ -9,6 +9,5 @@ numpy>=1.24.0
 tweepy
 tiktokapi
 instaloader
-facebook_scraper
-time
+facebook-scraper
 re
