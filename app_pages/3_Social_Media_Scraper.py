@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 import tweepy
 import instaloader
 import facebook_scraper
-import time
 import re
 
 def get_tweet_id(url):

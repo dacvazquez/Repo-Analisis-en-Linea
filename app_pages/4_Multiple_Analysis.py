@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 from pysentimiento import create_analyzer
 from analizer_functions import sentiment_analisys, hate_analisys
-
+import torch
+torch._C._disable_custom_class_register() 
 @st.cache_resource
 def load_analizers():
     sentiment_analyzer = create_analyzer(task="sentiment", lang="es")
