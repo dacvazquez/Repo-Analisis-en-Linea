@@ -4,10 +4,12 @@ from analizer_functions import sentiment_analisys, hate_analisys
 
 @st.cache_resource
 def load_analizers():
-    sentiment_analyzer = create_analyzer(task="sentiment", lang="es")
-    hate_analizer = create_analyzer(task="hate_speech", lang="es")
-    return sentiment_analyzer, hate_analizer
-
+    try:
+        sentiment_analyzer = create_analyzer(task="sentiment", lang="es")
+        hate_analizer = create_analyzer(task="hate_speech", lang="es")
+        return sentiment_analyzer, hate_analizer
+    except Exception as e:
+        st.error(f'Ocurrio un error al cargar los modelos para el análisis: \n{e}')
 def main():
     st.title("Análisis de Texto")
     
