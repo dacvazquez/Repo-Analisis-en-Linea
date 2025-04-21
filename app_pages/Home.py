@@ -116,10 +116,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-captions=("Analizar el sentimiento y el odio de un texto específico", 
-          "Para obtener Tweets de un usuario específico", 
-          "Para analizar varios textos a la vez y visualizar los resultados en un dataframe", 
-          "Para observar los análisis cuantitativos y cualitativos sobre los textos almacenados en el dataframe")
 
 # Inicializar session_state
 if 'analysis_df' not in st.session_state:
@@ -154,7 +150,11 @@ def main():
         st.title("Deteccion de comportamiento transgresivo en redes sociales")
         with open('textoIntro.txt', "r", encoding="utf-8") as file:
             contenido = file.read() 
-        st.text_area("Texto", contenido, height=600)
+        #with st.expander("Instrucciones"):
+        #    st.write(contenido)
+        with st.container(border=True):
+            st.write(contenido)    
+        
         # Cargar analizadores una sola vez
         sentiment_analyzer, hate_analizer = load_analizers()
         
