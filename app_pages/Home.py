@@ -1,21 +1,8 @@
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
 from pysentimiento import create_analyzer
 from analizer_functions import sentiment_analisys, hate_analisys
-from x_scraper import get_tweets_and_replies
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-import numpy as np
-from nltk.corpus import stopwords
-import nltk
 
-# Download required NLTK data
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
-    
 # Añadir CSS personalizado para la barra lateral
 st.markdown("""
     <style>
@@ -121,26 +108,6 @@ st.markdown("""
 if 'analysis_df' not in st.session_state:
     st.session_state.analysis_df = pd.DataFrame(columns=['Texto', 'Análisis de Sentimiento', 'Análisis de Odio'])
 
-@st.cache_resource
-def load_analizers():
-    # Para ansentiment_analyzer, hate_analizerálisis de sentimiento
-    sentiment_analyzer = create_analyzer(task="sentiment", lang="es")
-    # Para detección de discurso de odio
-    hate_analizer = create_analyzer(task="hate_speech", lang="es")
-    return sentiment_analyzer, hate_analizer
-
-@st.cache_data
-def analyze_text(text, sentiment_analyzer, hate_analizer):
-    """Función optimizada para analizar texto y devolver los resultados"""
-    resp_sentiment, _ = sentiment_analisys(text, sentiment_analyzer)
-    resp_hate, _ = hate_analisys(text, hate_analizer)
-    
-    # Extraer resultados
-    sentiment_result = resp_sentiment.split("El sentimiento es: ")[1].split("</p>")[0]
-    hate_result = resp_hate.split("El texto es: ")[1].split("</p>")[0]
-    
-    return sentiment_result, hate_result
-
 
 def main():
     # Crear el layout principal con dos columnas
@@ -154,10 +121,7 @@ def main():
         #    st.write(contenido)
         with st.container(border=True):
             st.write(contenido)    
-        
-        # Cargar analizadores una sola vez
-        sentiment_analyzer, hate_analizer = load_analizers()
-        
+
        
     with right_col:
         st.markdown("### 📊 Panel de Información")
