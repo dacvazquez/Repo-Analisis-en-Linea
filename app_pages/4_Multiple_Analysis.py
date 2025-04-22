@@ -1,14 +1,7 @@
 import streamlit as st
 import pandas as pd
-from pysentimiento import create_analyzer
 from analizer_functions import sentiment_analisys, hate_analisys
-import torch
-
-@st.cache_resource
-def load_analizers():
-    sentiment_analyzer = create_analyzer(task="sentiment", lang="es")
-    hate_analizer = create_analyzer(task="hate_speech", lang="es")
-    return sentiment_analyzer, hate_analizer
+from model_loader import load_models as lm
 
 def main():
     st.title("Análisis Múltiple de Textos")
@@ -39,7 +32,7 @@ def main():
         st.write(hate_result, unsafe_allow_html=True)
     
     # Cargar analizadores
-    sentiment_analyzer, hate_analizer = load_analizers()
+    sentiment_analyzer, hate_analizer = lm()
     
     # Entrada de texto
     st.subheader("Añadir Nuevo Texto")

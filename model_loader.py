@@ -5,9 +5,6 @@ import os
 from huggingface_hub import HfFolder
 
 def load_models():
-    """
-    Carga los modelos de análisis de manera eficiente y con manejo de errores.
-    """
     try:
         # Verificar si hay GPU disponible
         device = "cuda" if torch.cuda.is_available() else "cpu"
