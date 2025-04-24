@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from analizer_functions import sentiment_analisys, hate_analisys
 from model_loader import load_models as lm
+import colores_resp as cr
 
 def main():
     st.title("Análisis Múltiple de Textos")
@@ -47,13 +48,13 @@ def main():
             # Declarar color del sentimiento
             if sentiment == 'NEG':
                 sentiment='Negativo'
-                sentiment_response="**<font color='red'>Negativo</font>**"
+                sentiment_response=cr.negativo
             elif sentiment == 'POS':
                 sentiment='Positivo'
-                sentiment_response="**<font color='green'>Positivo</font>**"
+                sentiment_response=cr.positivo
             else:
                 sentiment='Neutro'
-                sentiment_response="**<font color='grey'>Neutro</font>**"
+                sentiment_response=cr.neutro
             
             # Declarar color del Odio
             resp=''
@@ -64,18 +65,18 @@ def main():
             for clasification in hate:
                 if clasification == 'hateful':
                     hateful = True
-                    hate_response = "**<font color='red'>Odioso</font>**"
+                    hate_response = cr.odioso
                 elif clasification == 'aggressive':
                     aggressive = True
-                    hate_response = "**<font color='orange'>Agresivo</font>**"
+                    hate_response = cr.agresivo
                 elif clasification == 'targeted':
                     targeted = True
-                    hate_response = "**<font color='yellow'>Dirigido</font>**"
+                    hate_response = cr.dirigido
                 elif clasification == 'none':
-                    hate_response = "**<font color='green'>No odioso</font>**"
-                resp+=f"El texto es: {hate_response} con un rating de {probs_hate[clasification]*100:.2f}%. <br>"
+                    hate_response = cr.no_odioso
+                resp+=f"El texto es: {hate_response} con una precisión de {probs_hate[clasification]*100:.2f}%. <br>"
             if resp=='':
-                resp=f"El texto es: **<font color='green'>No odioso</font>**"
+                resp=f"El texto es: {cr.no_odioso}"
 
             # Guardar resultados para mostrar después del rerun
             sentiment_result = f"El sentimiento es {sentiment_response} con una intensidad de {prob_sentiment:.2f}"

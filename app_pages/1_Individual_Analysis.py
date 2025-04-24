@@ -1,6 +1,7 @@
 import streamlit as st
 from analizer_functions import sentiment_analisys, hate_analisys
 from model_loader import load_models as lm
+import colores_resp as cr
 
 def main():
     st.title("Análisis de Texto")
@@ -19,11 +20,11 @@ def main():
                 
             # Declarar color del sentimiento
             if sentiment == 'NEG':
-                color_resp="**<font color='red'>Negativo</font>**"
+                color_resp=cr.negativo
             elif sentiment == 'POS':
-                color_resp="**<font color='green'>Positivo</font>**"
+                color_resp=cr.positivo
             else:
-                color_resp="**<font color='grey'>Neutro</font>**"
+                color_resp=cr.neutro
 
             st.markdown(f"El texto es sentimentalmente: {color_resp}", unsafe_allow_html=True)
             with st.container():
@@ -39,14 +40,14 @@ def main():
             resp=''
             for clasification in hate:
                 if clasification == 'hateful':
-                    hate_response = "**<font color='red'>Odioso</font>**"
+                    hate_response = cr.odioso
                 elif clasification == 'aggressive':
-                    hate_response = "**<font color='orange'>Agresivo</font>**"
+                    hate_response = cr.agresivo
                 elif clasification == 'targeted':
-                    hate_response = "**<font color='yellow'>Dirigido</font>**"
+                    hate_response = cr.odioso
                 elif clasification == 'none':
-                    hate_response = "**<font color='green'>No odioso</font>**"
-                resp+=f"El texto es: {hate_response} con un rating de {hate_probs[clasification]*100:.2f}%. <br>"
+                    hate_response = cr.no_odioso
+                resp+=f"El texto es: {hate_response} con una precisión de {hate_probs[clasification]*100:.2f}%. <br>"
             if resp=='':
                 resp=f"El texto es: **<font color='green'>No odioso</font>**"
             st.markdown(resp, unsafe_allow_html=True)
