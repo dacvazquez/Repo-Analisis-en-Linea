@@ -5,7 +5,6 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from nltk.corpus import stopwords
 import nltk
-import os
 import io
 
 # Download required NLTK data
@@ -46,9 +45,9 @@ def main():
         
         # Calcular métricas de odio
         hate_counts = {
-            'hateful': st.session_state.analysis_df['Odio'].sum(),
-            'aggressive': st.session_state.analysis_df['Agresividad'].sum(),
-            'targeted': st.session_state.analysis_df['Objetivismo'].sum()
+            'Odio': st.session_state.analysis_df['Odio'].sum(),
+            'Agresividad': st.session_state.analysis_df['Agresividad'].sum(),
+            'Objetivismo': st.session_state.analysis_df['Objetivismo'].sum()
         }
         total_hate = sum(hate_counts.values())
         
@@ -73,7 +72,7 @@ def main():
         
         with col3:
             dominant_hate = max(hate_counts.items(), key=lambda x: x[1])[0]
-            st.markdown("#### ⚠️ Análisis de Odio")
+            st.markdown("#### 🤬 Análisis de Odio")
             st.metric("Tipo de Odio Dominante", dominant_hate)
             # Mostrar tasas individuales para cada tipo de odio
             for hate_type, count in hate_counts.items():
@@ -102,7 +101,7 @@ def main():
             for hate_type, count in hate_counts.items():
                 percentage = round((count / total_texts * 100), 1)
                 st.metric(
-                    f"Tipo {hate_type}",
+                    f"{hate_type}",
                     f"{percentage}%",
                     f"{count} textos"
                 )
@@ -173,7 +172,7 @@ def main():
         st.markdown("### Nube de Palabras")
         st.markdown("<br>", unsafe_allow_html=True)
         
-        col1, col2 = st.columns([1, 1])
+        col1, col2 = st.columns([1, 1], gap="large")
         
         with col1:
             # Combinar todos los textos

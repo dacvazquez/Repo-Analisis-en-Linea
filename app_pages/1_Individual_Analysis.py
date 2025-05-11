@@ -2,14 +2,24 @@ import streamlit as st
 from analizer_functions import sentiment_analisys, hate_analisys
 from model_loader import load_models as lm
 import colores_resp as cr
+import pandas as pd
 
+help="""
+El análisis de sentimiento es el proceso de analizar texto digital para determinar si el tono emocional del mensaje es positivo, negativo o neutral
+\n
+El odio o el discurso de odio se define como manifestaciones verbales o escritas de intolerancia y 
+hostilidad, representan una amenaza insidiosa para la cohesión social y la dignidad humana. 
+Estas expresiones, que a menudo se basan en prejuicios raciales, religiosos, de género o 
+identidad, buscan deshumanizar y marginar a grupos específicos, alimentando un clima de miedo 
+y división. 
+"""
 def main():
     st.title("Análisis de Texto")
     
     # Cargar analizadores
     sentiment_analyzer, hate_analizer = lm()
     
-    option = st.selectbox("Elige una opción", ["Análisis de Sentimiento", "Detección de Odio"])
+    option = st.selectbox("Elige una opción", ["Análisis de Sentimiento", "Detección de Odio"], help=help)
     st.markdown("<br>", unsafe_allow_html=True)
     
     if option == "Análisis de Sentimiento":

@@ -9,10 +9,6 @@ st.markdown("""
     .stRadio > div {
         margin-left: 20px;
     }
-    /*Subir un poco el titulo*/
-    #deteccion-de-comportamiento-transgresivo-en-redes-sociales{
-    padding-top:0;    
-    }
     #root > div:nth-child(1) > div.withScreencast > div > div > section.stSidebar.st-emotion-cache-1wqrzgl.e1tphpha0 > div.st-emotion-cache-6qob1r.e1tphpha8 > div.st-emotion-cache-a6qe2i.e1tphpha7 > div > div > div > div > div:nth-child(2) > div > label > div > p{
         font-size: 20px;
         text-align: center;
@@ -112,16 +108,36 @@ st.markdown("""
 if 'analysis_df' not in st.session_state:
     st.session_state.analysis_df = pd.DataFrame(columns=['Texto', 'Análisis de Sentimiento', 'Análisis de Odio'])
 
-    
 def main():
+    # Crear el layout principal con dos columnas
+    main_col, right_col = st.columns([7, 3])
+    
+    with main_col:
+        st.title("Deteccion de comportamiento transgresivo en redes sociales")
+        with open('textoIntro.txt', "r", encoding="utf-8") as file:
+            contenido = file.read() 
+        #with st.expander("Instrucciones"):
+        #    st.write(contenido)
+        with st.container(border=True):
+            st.write(contenido)    
 
-    st.title("Deteccion de comportamiento transgresivo en redes sociales")
-    st.markdown("<br>", unsafe_allow_html=True)
-    with open('textoIntro.txt', "r", encoding="utf-8") as file:
-        contenido = file.read() 
-    #with st.expander("Instrucciones"):
-    #    st.write(contenido)
-    with st.container(border=True):
-        st.write(contenido)    
+       
+    with right_col:
+        st.markdown("### 📊 Panel de Información")
+        
+        st.image("Icons/eye.svg", width=200)
+        st.markdown("""
+        ---
+        ### 📈 Información
+        - Total de textos analizados
+        - Última actualización
+        - Estado del sistema
+        """)
+        
+        if 'analysis_df' in st.session_state and not st.session_state.analysis_df.empty:
+            st.markdown("### 📊 Resumen de Datos")
+            st.metric("Total de textos analizados", len(st.session_state.analysis_df))
+            st.metric("Última Actualización", pd.Timestamp.now().strftime("%Y-%m-%d %H:%M"))
+
 
 main()
