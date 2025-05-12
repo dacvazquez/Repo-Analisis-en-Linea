@@ -17,4 +17,3 @@ instaloader>=4.14.1
 facebook-scraper==0.2.59
 lxml-html-clean
 tiktokapi
-streamlit-option-menu

@@ -27,12 +27,10 @@ def save_wordcloud_to_buffer(wordcloud):
 def main():
     st.title("Dashboard de Análisis")
     
-    
     if 'analysis_df' not in st.session_state or st.session_state.analysis_df.empty:
         st.warning("No hay datos para analizar. Por favor, ingresa algunos textos primero.")
     else:
         # Primera fila: Métricas principales
-        st.divider()
         st.markdown("### Métricas Principales")
         
         # Calcular métricas adicionales
@@ -49,16 +47,16 @@ def main():
             'Agresividad': st.session_state.analysis_df['Agresividad'].sum(),
             'Objetivismo': st.session_state.analysis_df['Objetivismo'].sum()
         }
-        total_hate = sum(hate_counts.values())
+        # total_hate = sum(hate_counts.values())
         
         # Longitud promedio de textos
         avg_text_length = round(st.session_state.analysis_df['Texto'].str.len().mean(), 1)
         
         # Tasa de odio
-        hate_rate = round((total_hate / total_texts * 100), 1)
+        # hate_rate = round((total_hate / total_texts * 100), 1)
         
         # Primera fila: Métricas básicas
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3 = st.columns(3, border=True)
         
         with col1:
             st.markdown("#### 📊 Total de Análisis")
@@ -85,7 +83,7 @@ def main():
 
         st.markdown("### Métricas del Análisis")
         
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3 = st.columns(3, border=True)
         
         with col1:
             st.markdown("#### 📈 Análisis de Sentimientos")
@@ -127,29 +125,74 @@ def main():
         st.divider()
         st.markdown("### Distribuciones")
         st.markdown("<br>", unsafe_allow_html=True)
-        col1, col2 = st.columns(2)
+        col1, col2 = st.columns(2, border=True)
         
         with col1:
-            st.markdown("#### Distribución de Sentimientos")
+            st.markdown("#### 😊 Distribución de Sentimientos")
             st.markdown("<br>", unsafe_allow_html=True)
+
+            sentiment_counts = pd.Series(st.session_state.analysis_df['Análisis de Sentimiento'].value_counts())
+            
             # Definir colores para sentimientos
             sentiment_colors = {
                 'Positivo': '#2ecc71',  # Verde
                 'Neutro': '#95a5a6',    # Gris
                 'Negativo': '#e74c3c'   # Rojo
             }
+            
+            # Convertir valores a lista para evitar el error con max
+            sentiment_values = sentiment_counts.tolist()
+            max_sentiment = max(sentiment_values)
+            
             fig_sentiment = go.Figure(data=[go.Pie(
                 labels=sentiment_counts.index,
-                values=sentiment_counts.values,
-                hole=.3,
-                marker=dict(colors=[sentiment_colors.get(label, '#3498db') for label in sentiment_counts.index])
+                values=sentiment_values,
+                hole=0.3,
+                marker=dict(
+                    colors=[sentiment_colors.get(label, '#3498db') for label in sentiment_counts.index],
+                    line=dict(color='white', width=2)  # Borde blanco para mejor contraste
+                ),
+                textinfo='percent+label',  # Muestra porcentaje y etiqueta
+                textposition='inside',     # Texto dentro de las porciones
+                insidetextorientation='radial',  # Orientación del texto
+                rotation=45,              # Rotación inicial del gráfico
+                hoverinfo='label+percent+value',  # Info al pasar el mouse
+                textfont=dict(size=14, family='Arial', color='white'),  # Fuente del texto
+                pull=[0.05 if val == max_sentiment else 0 for val in sentiment_values] # Destacar la porción mayor
             )])
-            fig_sentiment.update_layout(height=400, margin=dict(t=20, b=20, l=20, r=20))
+
+            # Personalización del layout
+            fig_sentiment.update_layout(
+                height=500,
+                margin=dict(t=0, b=20, l=0, r=50),
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=-0.2,
+                    xanchor="center",
+                    x=0.5,
+                    font=dict(size=12)
+                ),
+                plot_bgcolor='rgba(0,0,0,0)',  # Fondo transparente
+                paper_bgcolor='rgba(0,0,0,0)'
+            )
+            fig_sentiment.update_traces(
+                hovertemplate="<b>%{label}</b><br>Porcentaje: %{percent}<br>Total: %{value}",
+                hoverlabel=dict(
+                    bgcolor="black",  # Fondo del tooltip
+                    font_size=14,     # Tamaño de fuente
+                    font_family="Arial",
+                    bordercolor="#333"  # Borde del tooltip
+                ),
+                name=""  # Eliminar "trace:0"
+            )
             st.plotly_chart(fig_sentiment, use_container_width=True)
         
         with col2:
-            st.markdown("#### Distribución de Tipos de Odio")
+            st.markdown("#### 🤬 Distribución de Tipos de Odio")
             st.markdown("<br>", unsafe_allow_html=True)
+            
             # Definir colores para tipos de odio
             hate_colors = {
                 'Odio': '#e74c3c',    # Rojo
@@ -157,16 +200,51 @@ def main():
                 'Objetivismo': '#9b59b6'     # Púrpura
             }
             fig_hate = go.Figure(data=[go.Pie(
-                labels=list(hate_counts.keys()),
-                values=list(hate_counts.values()),
-                hole=.3,
-                marker=dict(colors=[hate_colors.get(label, '#3498db') for label in hate_counts.keys()])
+            labels=list(hate_counts.keys()),
+            values=list(hate_counts.values()),
+            hole=0.3,
+            marker=dict(
+            colors=[hate_colors.get(label, '#3498db') for label in hate_counts.keys()],
+            line=dict(color='white', width=2)  # Borde blanco para mejor contraste
+            ),
+            textinfo='percent+label',  # Muestra porcentaje y etiqueta
+            textposition='inside',     # Texto dentro de las porciones
+            insidetextorientation='radial',  # Orientación del texto
+            rotation=45,              # Rotación inicial del gráfico
+            hoverinfo='label+percent+value',  # Info al pasar el mouse
+            textfont=dict(size=14, family='Arial', color='white'),  # Fuente del texto
+            pull=[0.05 if max(hate_counts.values()) == val else 0 for val in hate_counts.values()]  # Destacar la porción mayor
             )])
-            fig_hate.update_layout(height=400, margin=dict(t=20, b=20, l=20, r=20))
+
+             # Personalización del layout
+            fig_hate.update_layout(
+            height=500,
+            margin=dict(t=0, b=20, l=0, r=50),
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=-0.2,
+                xanchor="center",
+                x=0.5,
+                font=dict(size=12)
+            ),
+            plot_bgcolor='rgba(0,0,0,0)',  # Fondo transparente
+            paper_bgcolor='rgba(0,0,0,0)'
+            )
+            fig_hate.update_traces(
+                hovertemplate="<b>%{label}</b><br>Porcentaje: %{percent}<br>Total: %{value}",
+                hoverlabel=dict(
+                    bgcolor="black",  # Fondo del tooltip
+                    font_size=14,     # Tamaño de fuente
+                    font_family="Arial",
+                    bordercolor="#333"  # Borde del tooltip
+                ),
+                name=""  # ¡Esto es clave para eliminar "trace:0"!
+            )
             st.plotly_chart(fig_hate, use_container_width=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        
+            st.markdown("<br>", unsafe_allow_html=True)
+                    
         # Tercera fila: Nube de palabras
         st.divider()
         st.markdown("### Nube de Palabras")

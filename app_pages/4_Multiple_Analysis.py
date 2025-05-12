@@ -110,7 +110,7 @@ def main():
     if uploaded_file is not None and 'last_uploaded_file' not in st.session_state:
         try:
             # Intentar diferentes codificaciones y delimitadores
-            encodings = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252']
+            encodings = ['utf-8', 'latin1']
             delimiters = [',', ';', '\t', '\n']
             df = None
             
