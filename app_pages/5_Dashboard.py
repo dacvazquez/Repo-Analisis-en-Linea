@@ -152,9 +152,9 @@ def main():
             st.markdown("<br>", unsafe_allow_html=True)
             # Definir colores para tipos de odio
             hate_colors = {
-                'hateful': '#e74c3c',    # Rojo
-                'aggressive': '#f39c12',  # Naranja
-                'targeted': '#9b59b6'     # Púrpura
+                'Odio': '#e74c3c',    # Rojo
+                'Agresividad': '#f39c12',  # Naranja
+                'Objetivismo': '#9b59b6'     # Púrpura
             }
             fig_hate = go.Figure(data=[go.Pie(
                 labels=list(hate_counts.keys()),
