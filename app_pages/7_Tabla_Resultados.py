@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+from analizer_functions import sentiment_analisys, hate_analisys
+from model_loader import load_models as lm
 
 st.title("✏️ Resultados de Análisis")
 
@@ -19,7 +21,7 @@ st.dataframe(editable_df, use_container_width=True, height=400)
 row_to_edit = st.number_input("Selecciona el índice de la fila a editar", min_value=0, max_value=len(editable_df)-1, step=1)
 
 # Botones de acciones
-col1, col2, col3 = st.columns([1,1,1], vertical_alignment="center", gap="large")
+col1, col2, col3, col4 = st.columns([1,1,1,1], vertical_alignment="center", gap="large")
 with col1:
     if st.button("⬆️ Mover Arriba"):
         if row_to_edit > 0:
@@ -37,6 +39,24 @@ with col3:
         st.session_state.analysis_df.drop(index=row_to_edit, inplace=True)
         st.session_state.analysis_df.reset_index(drop=True, inplace=True)
         st.toast(f"Fila {row_to_edit} eliminada")
+with col4:
+    graficos = st.button("📊 Ver Gráficos")
+if graficos:
+    texto = editable_df.iloc[row_to_edit]['Texto']
+    sentiment_analyzer, hate_analizer = lm()
+    
+    # Realizar análisis
+    sentiment, prob_sentiment, fig_sentiment = sentiment_analisys(texto, sentiment_analyzer)
+    hate, probs_hate, fig_hate = hate_analisys(texto, hate_analizer)
+    
+    # Mostrar gráficos
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("### Distribución de Sentimientos")
+        st.plotly_chart(fig_sentiment, use_container_width=True)
+    with col2:
+        st.write("### Métricas de Odio")
+        st.plotly_chart(fig_hate, use_container_width=True)
 
 # Mostrar DataFrame actualizado si hubo cambios
 st.markdown("---")
