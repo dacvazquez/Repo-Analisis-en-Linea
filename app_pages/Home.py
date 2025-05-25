@@ -9,6 +9,10 @@ st.markdown("""
     .stRadio > div {
         margin-left: 20px;
     }
+    /*Bajar un poco el header del sidebar*/
+    div[data-testid="stSidebarHeader"]{
+    margin-top: 20px;
+    }
     /*Subir un poco el titulo*/
     #deteccion-de-comportamiento-transgresivo-en-redes-sociales{
     padding-top:0;    
@@ -115,7 +119,7 @@ if 'analysis_df' not in st.session_state:
     
 def main():
 
-    st.title("Deteccion de :red[comportamiento transgresivo] en redes sociales")
+    st.title("Detección de :red[comportamiento transgresivo] en redes sociales")
     st.markdown("<br>", unsafe_allow_html=True)
     with open('textoIntro.txt', "r", encoding="utf-8") as file:
         contenido = file.read() 
