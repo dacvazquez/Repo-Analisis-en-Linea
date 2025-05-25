@@ -127,9 +127,9 @@ def hate_analisys(text, hate_analizer):
     #df = pd.DataFrame(list(probs.items()), columns=['Etiqueta', 'Probabilidad'])
     # Crear el gráfico de barras
     fig = px.bar(df, x='Etiqueta', y='Intensidad', color='Etiqueta', color_discrete_map={
-    'Odioso': '#FF0000',  # Rojo
-    'Agresivo': '#FF9900',  # Naranja
-    'Dirigido': '#FFFF00'  # Amarillo
+    'Odioso': '#FF0000',   # Rojo
+    'Agresivo': '#FF9900', # Naranja
+    'Directo': '#FFFF00'   # Amarillo 
     })
     
     """    

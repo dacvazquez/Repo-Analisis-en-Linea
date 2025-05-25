@@ -3,6 +3,7 @@ import sys
 import os
 import asyncio
 import torch
+from model_loader import load_models as lm
 
 # 1. Corrección PyTorch
 if hasattr(torch.classes, '__path__'):
@@ -19,6 +20,8 @@ asyncio.set_event_loop(loop)
 
 # 2. Importar Streamlit después de las configuraciones
 import streamlit as st
+
+sentiment_analyzer, hate_analizer = lm()
 
 # Configurar el ancho máximo de la página
 st.set_page_config(
@@ -50,11 +53,11 @@ with st.sidebar:
             # Métricas de análisis
             st.markdown("### 🤬 Distribución de Odio")
             
-            hate_percentage = round((df['Odio'].sum() / len(df) * 100), 1)
-            aggressive_percentage = round((df['Agresividad'].sum() / len(df) * 100), 1)
-            objective_percentage = round((df['Objetivismo'].sum() / len(df) * 100), 1)
+            hate_percentage = round((df['Odio'].sum() / len(df) * 100))
+            aggressive_percentage = round((df['Agresividad'].sum() / len(df) * 100))
+            objective_percentage = round((df['Objetivismo'].sum() / len(df) * 100))
             
-            c1,c2,c3=st.columns(3)
+            c1,c2,c3=st.columns(3, vertical_alignment="center")
             with c1: st.metric("Odioso", f"{hate_percentage}%")
             with c2: st.metric("Agresivo", f"{aggressive_percentage}%")
             with c3: st.metric("Objetivo", f"{objective_percentage}%")
@@ -63,13 +66,14 @@ with st.sidebar:
 # Navegación personalizada
 pg = st.navigation([
     st.Page("app_pages/Home.py", title="Inicio", icon="🏠"),
-    st.Page("app_pages/1_Individual_Analysis.py", title="Análisis de Texto", icon="🔍"),
-    # st.Page("app_pages/2_Tweets.py", title="Extracción de Tweets", icon="🐦"),
-    st.Page("app_pages/3_Social_Media_Scraper.py", title="Extracción de Comentarios", icon="📱"),
-    st.Page("app_pages/4_Multiple_Analysis.py", title="Análisis Tabular", icon="🌐"),
+    # st.Page("app_pages/1_Individual_Analysis.py", title="Análisis de Texto", icon="🔍"),
+    st.Page("app_pages/2_Tweets.py", title="Extracción de Tweets", icon="🐦"),
+    #st.Page("app_pages/3_Social_Media_Scraper.py", title="Extracción de Comentarios", icon="📱"),
+    st.Page("app_pages/4_Multiple_Analysis.py", title="Análisis de Texto", icon="🌐"),
     st.Page("app_pages/5_Dashboard.py", title="Dashboard", icon="📊"),
     st.Page("app_pages/6_Word_Analysis.py", title="Importancia de Palabras", icon="🔤"),
-   
+    st.Page("app_pages/7_Tabla_Resultados.py", title="Tabla de Resultados", icon="⚖️"),
+
 ])
 
 pg.run()

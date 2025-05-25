@@ -198,13 +198,15 @@ def main():
                         # Botón para añadir al análisis múltiple
                         if st.button("➕ Añadir al Análisis Múltiple"):
                             if 'analysis_df' not in st.session_state:
-                                st.session_state.analysis_df = pd.DataFrame(columns=['Texto', 'Análisis de Sentimiento', 'Análisis de Odio'])
+                                st.session_state.analysis_df = pd.DataFrame(columns=['Texto', 'Análisis de Sentimiento', 'Odio', 'Agresividad', 'Objetivismo'])
                             
                             # Añadir solo los textos al DataFrame de análisis
                             new_rows = pd.DataFrame({
                                 'Texto': df['Text'],
                                 'Análisis de Sentimiento': [''] * len(df),
-                                'Análisis de Odio': [''] * len(df)
+                                'Odio': [''] * len(df),
+                                'Agresividad': [''] * len(df),
+                                'Objetivismo': [''] * len(df)
                             })
                             
                             st.session_state.analysis_df = pd.concat([st.session_state.analysis_df, new_rows], ignore_index=True)
