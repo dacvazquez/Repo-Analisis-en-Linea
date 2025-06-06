@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
-
+from pysentimiento.preprocessing import preprocess_tweet
 
 def sentiment_analisys(text, sentiment_analyzer):
     """
@@ -28,20 +28,26 @@ def sentiment_analisys(text, sentiment_analyzer):
         >>> print(f"Sentimiento: {sent}, Probabilidad: {prob}%")
         Sentimiento: POS, Probabilidad: 85.7%
     """
-    # Preprocess text
+
+    # Preprocesamiento del texto
+    # Antiguo método básico de preprocesamiento de texto:
+    """
     text_words=[]
     for word in text.split(' '):
         if word.startswith('@') and len(word)>1:
-            word='@user'
+            word='@usuario'
         elif word.startswith('http'):
-            word='http'
+            word=''
         text_words.append(word)
-    full_text= ' '.join(text_words)
-    
+    processed_text= ' '.join(text_words)
+    """
+    # Utilizando el preprocesamiento de pysentimiento
+    processed_text=preprocess_tweet(text)
+
     labels = ['Negativo', 'Neutro', 'Positivo']
     colores = ['#FF0000', '#808080', '#00FF00'] 
     
-    sentimiento=sentiment_analyzer.predict(full_text)
+    sentimiento=sentiment_analyzer.predict(processed_text)
     #ejemplo de salida: AnalyzerOutput(output=POS, probas={POS: 0.857, NEU: 0.103, NEG: 0.040})
     
     probs = sentimiento.probas #Probabilidades
@@ -91,18 +97,22 @@ def hate_analisys(text, hate_analizer):
         Categorías detectadas: ['hateful', 'aggressive']
         Probabilidades: {'hateful': 0.022, 'aggressive': 0.018, 'targeted': 0.009}
     """
-    # Preprocess text
+    # Preprocesamiento del texto
+    # Antiguo método básico de preprocesamiento de texto:
+    """
     text_words=[]
     for word in text.split(' '):
         if word.startswith('@') and len(word)>1:
-            word='@user'
+            word='@usuario'
         elif word.startswith('http'):
-            word='http'
+            word=''
         text_words.append(word)
-    full_text= ' '.join(text_words)
-    
-    hate=hate_analizer.predict(full_text)
-    
+    processed_text= ' '.join(text_words)
+    """
+    # Utilizando el preprocesamiento de pysentimiento
+    processed_text=preprocess_tweet(text)
+
+    hate=hate_analizer.predict(processed_text)
     #ejemplo de salida: AnalyzerOutput(output=[], probas={hateful: 0.022, targeted: 0.009, aggressive: 0.018})
     
     probs = hate.probas
