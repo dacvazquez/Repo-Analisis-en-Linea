@@ -17,10 +17,6 @@ st.markdown("""
     #deteccion-de-comportamiento-transgresivo-en-redes-sociales{
     padding-top:0;    
     }
-    #root > div:nth-child(1) > div.withScreencast > div > div > section.stSidebar.st-emotion-cache-1wqrzgl.e1tphpha0 > div.st-emotion-cache-6qob1r.e1tphpha8 > div.st-emotion-cache-a6qe2i.e1tphpha7 > div > div > div > div > div:nth-child(2) > div > label > div > p{
-        font-size: 20px;
-        text-align: center;
-    }
     button[kind="borderlessIconActive"]{
         margin: 5px 15px;
         margin-bottom: 10px;
@@ -28,15 +24,6 @@ st.markdown("""
     button[kind="borderlessIcon"]{
         margin: 0px 15px;
     }
-    .stRadio label {
-        font-size: 18px !important;
-        padding: 5px;
-        margin: 10px 0;
-    }
-    .stRadio > label {
-        font-size: 10px !important;
-    }
-    
     /* CSS de la columna derecha */
     div[data-testid="column"]:nth-child(2) {
         background-color: #f0f2f6;

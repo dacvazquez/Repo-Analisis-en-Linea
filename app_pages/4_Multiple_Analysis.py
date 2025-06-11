@@ -14,7 +14,7 @@ hostilidad, representan una amenaza insidiosa para la cohesión social y la dign
 """
 
 def main():
-    st.title("Análisis de Textos")
+    st.title("Análisis a Texto")
 
     if 'analysis_df' not in st.session_state:
         st.session_state.analysis_df = pd.DataFrame(columns=[
@@ -46,6 +46,9 @@ def main():
         if new_text:
             sentiment, prob_sentiment, fig_sentiment = sentiment_analisys(new_text, sentiment_analyzer)
             hate, probs_hate, fig_hate = hate_analisys(new_text, hate_analizer)
+            
+            # Guardar el texto analizado en session_state
+            st.session_state.last_analyzed_text = new_text
 
             if sentiment == 'NEG':
                 sentiment='Negativo'
@@ -85,43 +88,49 @@ def main():
         if new_text:
             if new_text in st.session_state.analysis_df['Texto'].values:
                 st.toast("Este texto ya fue analizado anteriormente 👀")
-            elif new_text=='':
+            elif new_text == '':
                 st.toast("No se puede añadir un texto vacío 👀")
             elif not st.session_state.last_analysis_results:
                 st.toast("Por favor, analiza el texto primero 🔍")
             else:
+                # Obtener el texto del último análisis
                 sentiment_result, hate_result, fig_sentiment, fig_hate = st.session_state.last_analysis_results
-
-                if 'Negativo' in sentiment_result:
-                    sentiment = 'Negativo'
-                elif 'Positivo' in sentiment_result:
-                    sentiment = 'Positivo'
-                else:
-                    sentiment = 'Neutro'
-
-                # Corregir la lógica para detectar odio
-                hateful = False
-                aggressive = False
-                targeted = False
                 
-                if 'odioso' in hate_result.lower() and 'no odioso' not in hate_result.lower():
-                    hateful = True
-                if 'agresivo' in hate_result.lower():
-                    aggressive = True
-                if 'dirigido' in hate_result.lower():
-                    targeted = True
+                # Verificar si el texto actual coincide con el último análisis
+                if 'last_analyzed_text' in st.session_state and st.session_state.last_analyzed_text == new_text:
+                    # Solo proceder si el texto coincide con el último análisis
+                    if 'Negativo' in sentiment_result:
+                        sentiment = 'Negativo'
+                    elif 'Positivo' in sentiment_result:
+                        sentiment = 'Positivo'
+                    else:
+                        sentiment = 'Neutro'
 
-                new_row = pd.DataFrame({
-                    'Texto': [new_text],
-                    'Análisis de Sentimiento': [sentiment],
-                    'Odio': [hateful],
-                    'Agresividad': [aggressive],
-                    'Objetivismo': [targeted]
-                })
-                st.session_state.analysis_df = pd.concat([st.session_state.analysis_df, new_row], ignore_index=True)
-                st.session_state.last_analysis_results = None  # Limpiamos los resultados
-                st.toast("Texto añadido correctamente 👍")
-                st.rerun()
+                    # Corregir la lógica para detectar odio
+                    hateful = False
+                    aggressive = False
+                    targeted = False
+                    
+                    if 'odioso' in hate_result.lower() and 'no odioso' not in hate_result.lower():
+                        hateful = True
+                    if 'agresivo' in hate_result.lower():
+                        aggressive = True
+                    if 'dirigido' in hate_result.lower():
+                        targeted = True
+
+                    new_row = pd.DataFrame({
+                        'Texto': [new_text],
+                        'Análisis de Sentimiento': [sentiment],
+                        'Odio': [hateful],
+                        'Agresividad': [aggressive],
+                        'Objetivismo': [targeted]
+                    })
+                    st.session_state.analysis_df = pd.concat([st.session_state.analysis_df, new_row], ignore_index=True)
+                    st.session_state.last_analysis_results = None  # Limpiamos los resultados
+                    st.toast("Texto añadido correctamente 👍")
+                    st.rerun()
+                else:
+                    st.toast("El texto actual no coincide con el último texto analizado. Por favor, analize el texto antes de añadirlo 🔍")
         else:
             st.toast("No hay texto para añadir 👀")
 

@@ -25,7 +25,7 @@ def save_wordcloud_to_buffer(wordcloud):
     return buffer
 
 def main():
-    st.title("Dashboard de Análisis")
+    st.title("Estadísticas del Análisis")
     
     if 'analysis_df' not in st.session_state or st.session_state.analysis_df.empty:
         st.warning("No hay datos para analizar. Por favor, ingresa algunos textos primero.")

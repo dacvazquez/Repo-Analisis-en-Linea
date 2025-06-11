@@ -30,16 +30,13 @@ st.set_page_config(
     page_icon="Icons/eye.svg",
 )
 with st.sidebar:
-        st.image("Icons/eye.svg", use_container_width=True)
+        if 'analysis_df' not in st.session_state or st.session_state.analysis_df.empty:
+            st.image("Icons/eye.svg", use_container_width=True)
         if 'analysis_df' in st.session_state and not st.session_state.analysis_df.empty:
             df = st.session_state.analysis_df
-            st.markdown("### 📊 Resumen de Datos")
             
             # Métricas básicas
-            st.metric("Total de textos analizados", len(df))
-            st.metric("Última Actualización", pd.Timestamp.now().strftime("%Y-%m-%d %H:%M"))
-            
-            st.markdown("---")
+            st.metric(label="### Total de textos analizados", value=len(df))
             # Distribución de sentimientos
             st.markdown("### 😊 Distribución de Sentimientos")
             sentiment_counts = df['Análisis de Sentimiento'].value_counts()
@@ -66,11 +63,11 @@ with st.sidebar:
 # Navegación personalizada
 pg = st.navigation([
     st.Page("app_pages/Home.py", title="Inicio", icon="🏠"),
-    # st.Page("app_pages/1_Individual_Analysis.py", title="Análisis de Texto", icon="🔍"),
+    # st.Page("app_pages/1_Individual_Analysis.py", title="Detección de Comportamiento", icon="🔍"),
     st.Page("app_pages/2_Tweets.py", title="Extracción de Tweets", icon="🐦"),
     #st.Page("app_pages/3_Social_Media_Scraper.py", title="Extracción de Comentarios", icon="📱"),
     st.Page("app_pages/4_Multiple_Analysis.py", title="Análisis de Texto", icon="🌐"),
-    st.Page("app_pages/5_Dashboard.py", title="Dashboard", icon="📊"),
+    st.Page("app_pages/5_Dashboard.py", title="Estadísticas del Análisis", icon="📊"),
     st.Page("app_pages/6_Word_Analysis.py", title="Importancia de Palabras", icon="🔤"),
     st.Page("app_pages/7_Tabla_Resultados.py", title="Tabla de Resultados", icon="⚖️"),
 

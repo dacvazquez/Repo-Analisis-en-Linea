@@ -2,6 +2,7 @@ import tweepy, time
 import pandas as pd
 import streamlit as st
 
+
 # Credenciales de la API de Twitter
 
 # Autenticación con la API v2
@@ -61,5 +62,58 @@ def get_tweets_and_replies(user_id, max_tweets):
         return None
     except Exception as e:
         st.write(f"Error inesperado: {e}")
+        print(e)
+        return None
+
+def get_tweet_comments(tweet_id, max_comments=200):
+    try:
+        query = f"conversation_id:{tweet_id}"
+        data = []
+        next_token = None
+
+        while len(data) < max_comments:
+            remaining = max_comments - len(data)
+            max_results = min(100, remaining)  # Twitter solo permite hasta 100 por llamada
+
+            response = client.search_recent_tweets(
+                query=query,
+                max_results=max_results,
+                tweet_fields=["created_at", "public_metrics"],
+                next_token=next_token
+            )
+
+            if response.data:
+                for reply in response.data:
+                    data.append({
+                        "Reply ID": reply.id,
+                        "Texto": reply.text,
+                        "Creado en": reply.created_at,
+                        "Likes": reply.public_metrics['like_count']
+                    })
+
+            # Obtener el token para la siguiente página, si existe
+            meta = response.meta
+            next_token = meta.get("next_token", None)
+            
+            if not next_token:
+                break  # No hay más páginas
+
+        if data:
+            df = pd.DataFrame(data)
+            return df
+        else:
+            st.warning("No se encontraron comentarios.")
+            return None
+
+    except tweepy.TooManyRequests as e:
+        st.error("Error 429: Límite de solicitudes excedido. Espera antes de continuar.")
+        print(e)
+        return None
+    except tweepy.TweepyException as e:
+        st.error(f"Error de la API: {e}")
+        print(e)
+        return None
+    except Exception as e:
+        st.error(f"Error inesperado: {e}")
         print(e)
         return None

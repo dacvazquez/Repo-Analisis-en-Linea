@@ -6,7 +6,7 @@ El comportamiento transgresor tradicional ha disminuido, pero las formas de comp
 
 En este contexto, presentamos una herramienta innovadora diseñada para detectar y analizar comportamientos transgresivos en línea. Esta aplicación utiliza tecnologías avanzadas de procesamiento de lenguaje natural y aprendizaje automático para identificar patrones de comportamiento transgresivo en textos y publicaciones de redes sociales.
 
-Nuestra aplicación ofrece las siguientes funcionalidades principales:
+La aplicación ofrece las siguientes funcionalidades principales:
 
 1. Análisis de Sentimientos: Evalúa el tono emocional de los textos, identificando si son positivos, negativos o neutros.
 2. Detección de Discurso de Odio: Identifica contenido que pueda considerarse agresivo, discriminatorio u ofensivo.

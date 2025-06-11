@@ -60,5 +60,5 @@ if graficos:
 
 # Mostrar DataFrame actualizado si hubo cambios
 st.markdown("---")
-st.subheader("🔄 Vista Actualizada del DataFrame")
+st.subheader("🔄 Vista Actualizada de la Tabla")
 st.dataframe(st.session_state.analysis_df, use_container_width=True)
