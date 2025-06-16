@@ -155,7 +155,7 @@ def main():
             st.write("### Distribución de Sentimientos")
             st.plotly_chart(fig_sentiment, use_container_width=True)
         with col2:
-            st.write("### Metricas de Odio")
+            st.write("### Métricas de Odio")
             st.plotly_chart(fig_hate, use_container_width=True)
 
     if not st.session_state.analysis_df.empty:
