@@ -77,7 +77,7 @@ def sentiment_analisys(text, sentiment_analyzer):
     # Personalización del layout
     fig.update_layout(
         height=450,
-        margin=dict(t=60, b=80),
+        margin=dict(t=60, b=80, l=0, r=50),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(size=14),
@@ -182,7 +182,7 @@ def hate_analisys(text, hate_analizer):
     # Personalización del layout
     fig.update_layout(
         height=450,
-        margin=dict(t=60, b=80),
+        margin=dict(t=60, b=80, l=0, r=50),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(size=14),
