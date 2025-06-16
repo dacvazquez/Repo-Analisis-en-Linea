@@ -75,7 +75,10 @@ def main():
             # Mostrar tasas individuales para cada tipo de odio
             for hate_type, count in hate_counts.items():
                 rate = round((count / total_texts * 100), 1)
-                st.metric(f"Tasa de {hate_type}", f"{rate}%")
+                max_hate_type = max(hate_counts, key=lambda x: hate_counts[x] / total_texts)
+                # st.metric(f"Tasa de {hate_type}", f"{rate}%")
+                max_rate = round((hate_counts[max_hate_type] / total_texts * 100), 1)
+            st.metric(f"Tasa de {max_hate_type}", f"{max_rate}%")
         
         # Segunda fila: Métricas detalladas
         st.markdown("<br>", unsafe_allow_html=True)
@@ -325,5 +328,92 @@ def main():
                 ):
                     st.toast("Nube de palabras filtrada guardada correctamente")
 
+        # Nueva sección: Análisis de Patrones
+        st.divider()
+        st.markdown("### Análisis de Patrones")
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2, border=True)
+        
+        with col1:
+            st.markdown("#### 📈 Patrones de Sentimiento y Odio")
 
+            # Calcular porcentaje de textos con odio por sentimiento
+            sentiment_hate_pattern = pd.crosstab(
+                st.session_state.analysis_df['Análisis de Sentimiento'],
+                st.session_state.analysis_df['Odio'],
+                normalize='index'
+            ) * 100
+
+            # Colores personalizados
+            colors = {
+                True: '#FF553B',   # Rojo para "Con Odio"
+                False: '#636EFA'   # Azul para "Sin Odio"
+            }
+
+            # Crear gráfico de barras apiladas
+            fig_pattern = go.Figure()
+
+            for hate in [True, False]:
+                fig_pattern.add_trace(go.Bar(
+                    name='Con Odio' if hate else 'Sin Odio',
+                    x=sentiment_hate_pattern.index,
+                    y=sentiment_hate_pattern[hate],
+                    text=sentiment_hate_pattern[hate].round(1).astype(str) + '%',
+                    textposition='inside',
+                    marker_color=colors[hate],
+                    hovertemplate='%{y:.1f}%<br>Sentimiento: %{x}<extra></extra>'
+                ))
+
+            fig_pattern.update_layout(
+                barmode='stack',
+                title='Distribución de Odio por Sentimiento',
+                xaxis_title='Sentimiento',
+                yaxis_title='Porcentaje',
+                height=450,
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(size=14),
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=-0.3,
+                    xanchor="center",
+                    x=0.5,
+                    font=dict(size=13)
+                ),
+                margin=dict(t=60, b=80)
+            )
+
+            st.plotly_chart(fig_pattern, use_container_width=True)
+        with col2:
+            st.markdown("#### 📊 Distribución de Longitud de Textos")
+
+            # Crear histograma de longitudes de texto
+            text_lengths = st.session_state.analysis_df['Texto'].str.len()
+
+            fig_length = go.Figure()
+            fig_length.add_trace(go.Histogram(
+                x=text_lengths,
+                nbinsx=30,
+                name='Longitud de Textos',
+                marker_color='#636EFA',  # Azul moderno para coherencia
+                opacity=0.85,
+                hovertemplate='Longitud: %{x}<br>Frecuencia: %{y}<extra></extra>'
+            ))
+
+            fig_length.update_layout(
+                title='Distribución de Longitud de Textos',
+                xaxis_title='Longitud (caracteres)',
+                yaxis_title='Frecuencia',
+                height=450,
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font=dict(size=14),
+                margin=dict(t=60, b=80),
+                bargap=0.05
+            )
+
+            st.plotly_chart(fig_length, use_container_width=True)
 main() 

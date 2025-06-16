@@ -36,11 +36,15 @@ def main():
 
     new_text = st.text_area("Ingrese el texto a analizar 🔍")
 
-    col1, col2, col3 = st.columns([1, 1, 8])
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 6])
     with col1:
         analizar = st.button("Analizar", help=help)
     with col2:
         anadir = st.button("Añadir", help="Añade el texto y los resultados de su análisis a la tabla")
+    with col3:  
+        descartar = st.button("Descartar", 
+                            help="Elimina los resultados del análisis actual",
+                            disabled='last_analysis_results' not in st.session_state or st.session_state.last_analysis_results is None)
 
     if analizar:
         if new_text:
@@ -133,9 +137,17 @@ def main():
                     st.toast("El texto actual no coincide con el último texto analizado. Por favor, analize el texto antes de añadirlo 🔍")
         else:
             st.toast("No hay texto para añadir 👀")
-
+    if descartar:
+        st.session_state.last_analysis_results = None
+        if 'last_analyzed_text' in st.session_state:
+               del st.session_state.last_analyzed_text
+        st.toast("Resultados descartados correctamente")
+        st.rerun()
+            
     if st.session_state.last_analysis_results:
         sentiment_result, hate_result, fig_sentiment, fig_hate = st.session_state.last_analysis_results
+        st.markdown(f'##### Resultados del análisis para el texto: "*{st.session_state.last_analyzed_text}*"')
+
         st.write(sentiment_result, unsafe_allow_html=True)
         st.write(hate_result, unsafe_allow_html=True)
         col1,col2= st.columns([1,1])    
@@ -230,7 +242,12 @@ def main():
             if df is None or df.empty:
                 st.error("No se pudo leer el archivo. Por favor, asegúrate de que el archivo contenga datos válidos.")
                 return
-
+            
+            # Eliminar columnas de índice duplicadas
+            if 'Unnamed: 0' in df.columns:
+                df = df.drop('Unnamed: 0', axis=1)
+            
+            # Si el archivo tiene una sola columna analizar los textos 
             if len(df.columns) == 1:
                 st.info("Archivo con una sola columna, se analizarán los textos.")
                 text_column = df.columns[0]
@@ -280,6 +297,7 @@ def main():
                     st.session_state.analysis_df = df
                     st.toast("Archivo importado correctamente 👍")
                     st.session_state.last_uploaded_file = uploaded_file.name
+                    st.rerun()
                 else:
                     st.error(f"El archivo debe contener las columnas: {', '.join(required_columns)}")
         except Exception as e:

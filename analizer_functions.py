@@ -56,11 +56,41 @@ def sentiment_analisys(text, sentiment_analyzer):
     probs_array = np.array(list(probs.values()))
     max_prob=np.max(probs_array)
         
+    # Definir colores modernos y consistentes
+    colors = {
+        'Positivo': '#2ecc71',  # Verde
+        'Neutro': '#95a5a6',    # Gris
+        'Negativo': '#e74c3c'   # Rojo
+    }
     
-    fig = go.Figure(data=[go.Pie(labels=labels, values=probs_array, 
-                             textinfo='label+percent', textposition='inside',
-                             marker_colors=colores)])
-   
+    fig = go.Figure(data=[go.Pie(
+        labels=labels, 
+        values=probs_array, 
+        textinfo='label+percent', 
+        textposition='inside',
+        marker_colors=[colors[label] for label in labels],
+        hole=0.3,
+        rotation=45,
+        hovertemplate='%{label}<br>Probabilidad: %{percent:.1%}<extra></extra>'
+    )])
+    
+    # Personalización del layout
+    fig.update_layout(
+        height=450,
+        margin=dict(t=60, b=80),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(size=14),
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3,
+            xanchor="center",
+            x=0.5,
+            font=dict(size=13)
+        )
+    )
 
     return sent, max_prob*100, fig
     
@@ -120,27 +150,47 @@ def hate_analisys(text, hate_analizer):
     
     #labels = ['Odioso', 'Agresivo', 'Dirigido', 'No Odioso']
     
-    #probs_array = np.array(list(probs.values()))
-    #max_prob=np.max(probs_array)
-        
     # Etiquetas y valores
     traduccion = {
-    'hateful': 'Odioso',
-    'aggressive': 'Agresivo',
-    'targeted': 'Directo'
+        'hateful': 'Odioso',
+        'aggressive': 'Agresivo',
+        'targeted': 'Directo'
     }
+    
+    # Definir colores modernos y consistentes
+    colors = {
+        'Odioso': '#e74c3c',    # Rojo
+        'Agresivo': '#f39c12',  # Naranja
+        'Directo': '#9b59b6'     # Púrpura
+    }
+    
     df = pd.DataFrame({
-    'Etiqueta': [traduccion[k] for k in probs.keys()],
-    'Intensidad': list(probs.values())
+        'Etiqueta': [traduccion[k] for k in probs.keys()],
+        'Intensidad': list(probs.values())
     })
     
-    #df = pd.DataFrame(list(probs.items()), columns=['Etiqueta', 'Probabilidad'])
-    # Crear el gráfico de barras
-    fig = px.bar(df, x='Etiqueta', y='Intensidad', color='Etiqueta', color_discrete_map={
-    'Odioso': '#FF0000',   # Rojo
-    'Agresivo': '#FF9900', # Naranja
-    'Directo': '#FFFF00'   # Amarillo 
-    })
+    # Crear el gráfico de barras con estilo moderno
+    fig = go.Figure(data=[go.Bar(
+        x=df['Etiqueta'],
+        y=df['Intensidad'],
+        marker_color=[colors[label] for label in df['Etiqueta']],
+        text=df['Intensidad'].apply(lambda x: f'{x:.1%}'),
+        textposition='inside',
+        hovertemplate='%{x}<br>Intensidad: %{y:.1%}<extra></extra>'
+    )])
+    
+    # Personalización del layout
+    fig.update_layout(
+        height=450,
+        margin=dict(t=60, b=80),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(size=14),
+        xaxis_title='Tipo de Contenido',
+        yaxis_title='Intensidad',
+        bargap=0.05,
+        showlegend=False
+    )
     
     """    
     # Dar una respuestas

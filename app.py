@@ -36,14 +36,17 @@ st.markdown("""
     .stRadio > div {
         margin-left: 20px;
     }
+    
     /*Bajar un poco el header del sidebar*/
     div[data-testid="stSidebarHeader"]{
     margin-top: 20px;
     }
+    
     /*Subir un poco el titulo*/
     #deteccion-de-comportamiento-transgresivo-en-redes-sociales{
     padding-top:0;    
     }
+    
     button[kind="borderlessIconActive"]{
         margin: 5px 15px;
         margin-bottom: 10px;
@@ -166,7 +169,7 @@ pg = st.navigation([
     st.Page("app_pages/4_Multiple_Analysis.py", title="Análisis de Texto", icon="🌐"),
     st.Page("app_pages/5_Dashboard.py", title="Estadísticas del Análisis", icon="📊"),
     st.Page("app_pages/6_Word_Analysis.py", title="Importancia de Palabras", icon="🔤"),
-    st.Page("app_pages/7_Tabla_Resultados.py", title="Tabla de Resultados", icon="⚖️"),
+    st.Page("app_pages/7_Tabla_Resultados.py", title="Tabla de Resultados", icon="🔍"),
 
 ])
 

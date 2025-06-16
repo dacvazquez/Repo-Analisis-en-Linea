@@ -8,18 +8,19 @@ En este contexto, presentamos una herramienta innovadora diseñada para detectar
 
 La aplicación ofrece las siguientes funcionalidades principales:
 
-🐦 Extracción de Tweets: implementa extracción de contenido directamente desde Twitter.
+- 🐦 Extracción de Tweets: implementa extracción de contenido directamente desde Twitter.
 
-😊 Análisis de Sentimientos: Evalúa el tono emocional de los textos, identificando si son positivos, negativos o neutros.
+- 🌐 Análisis de Texto: Realizar analisis a comentarios o textos. Permite procesar varios textos simultáneamente para identificar patrones de comportamiento.
 
-🤬 Detección de Discurso de Odio: Identifica contenido que pueda considerarse agresivo, discriminatorio u ofensivo.
+    - 😊 Análisis de Sentimientos: Evalúa el tono emocional de los textos, identificando si son positivos, negativos o neutros.
 
-🌐 Análisis de Texto: Permite procesar varios textos simultáneamente para identificar patrones de comportamiento.
+    - 🤬 Detección de Discurso de Odio: Identifica contenido que pueda considerarse agresivo, discriminatorio u ofensivo.
 
-📊 Análisis Estadístico: Proporciona métricas y visualizaciones detalladas sobre la distribución y tendencias de los comportamientos transgresivos.
+- 📊 Análisis Estadístico: Proporciona métricas y visualizaciones detalladas sobre la distribución y tendencias de los comportamientos transgresivos.
 
-🔍 Importancia de Palabras: Identifica y destaca las palabras clave más relevantes en el contexto de comportamientos transgresivos.
+- 🔤 Importancia de Palabras: Identifica y destaca las palabras clave más relevantes en la clasificación de comportamientos transgresivos.
 
+- 🔍 Tabla de Resultados: Permite mover y eliminar filas de los análisis realizados y añadidos a la tabla  
 
 La herramienta está construida sobre RoBERTuito, un modelo de inteligencia artificial basado en la tecnología de transformers, preentrenado con más de 500 millones de tweets. Este robusto modelo nos permite realizar análisis precisos y contextualizados del contenido en español, considerando las particularidades del lenguaje utilizado en redes sociales.
 
