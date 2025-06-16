@@ -8,7 +8,7 @@ def main():
     if 'tweets_df' not in st.session_state:
         st.session_state.tweets_df = None
     
-    st.write("ID de usuario de la universidad: 2277112266")
+    # st.write("ID de usuario de la universidad: 2277112266")
     
     # Sección para cargar tweets previos
     st.subheader("Cargar Tweets Locales")
