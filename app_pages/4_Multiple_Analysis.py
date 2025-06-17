@@ -145,22 +145,23 @@ def main():
         st.rerun()
             
     if st.session_state.last_analysis_results:
-        sentiment_result, hate_result, fig_sentiment, fig_hate = st.session_state.last_analysis_results
-        st.markdown(f'##### Resultados del análisis para el texto: "*{st.session_state.last_analyzed_text}*"')
+        with st.expander(f'Resultados del análisis para el texto: "*{st.session_state.last_analyzed_text}*"', icon="🔍", expanded=True):  
+            sentiment_result, hate_result, fig_sentiment, fig_hate = st.session_state.last_analysis_results
 
-        st.write(sentiment_result, unsafe_allow_html=True)
-        st.write(hate_result, unsafe_allow_html=True)
-        col1,col2= st.columns([1,1])    
-        with col1:
-            st.write("### Distribución de Sentimientos")
-            st.plotly_chart(fig_sentiment, use_container_width=True)
-        with col2:
-            st.write("### Métricas de Odio")
-            st.plotly_chart(fig_hate, use_container_width=True)
+            st.write(sentiment_result, unsafe_allow_html=True)
+            st.write(hate_result, unsafe_allow_html=True)
+            st.markdown("---")
+            col1,col2= st.columns([1,1])    
+            with col1:
+                st.write("### Distribución de Sentimientos")
+                st.plotly_chart(fig_sentiment, use_container_width=True)
+            with col2:
+                st.write("### Métricas de Odio")
+                st.plotly_chart(fig_hate, use_container_width=True)
 
-    if not st.session_state.analysis_df.empty:
-        st.subheader("Tabla de Resultados")
-        st.write(st.session_state.analysis_df)
+        if not st.session_state.analysis_df.empty:
+            st.subheader("Tabla de Resultados")
+            st.write(st.session_state.analysis_df)
 
     st.subheader("Importar Datos")
     

@@ -20,7 +20,7 @@ La aplicación ofrece las siguientes funcionalidades principales:
 
 - 🔤 Importancia de Palabras: Identifica y destaca las palabras clave más relevantes en la clasificación de comportamientos transgresivos.
 
-- 🔍 Tabla de Resultados: Permite mover y eliminar filas de los análisis realizados y añadidos a la tabla  
+- 🔍 Tabla de Resultados: Permite mover y eliminar filas de los análisis realizados y añadidos a la tabla.  
 
 La herramienta está construida sobre RoBERTuito, un modelo de inteligencia artificial basado en la tecnología de transformers, preentrenado con más de 500 millones de tweets. Este robusto modelo nos permite realizar análisis precisos y contextualizados del contenido en español, considerando las particularidades del lenguaje utilizado en redes sociales.
 
