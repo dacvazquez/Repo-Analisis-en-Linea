@@ -147,11 +147,13 @@ def main():
     if st.session_state.last_analysis_results:
         with st.expander(f'Resultados del análisis para el texto: "*{st.session_state.last_analyzed_text}*"', icon="🔍", expanded=True):  
             sentiment_result, hate_result, fig_sentiment, fig_hate = st.session_state.last_analysis_results
-
-            st.write(sentiment_result, unsafe_allow_html=True)
-            st.write(hate_result, unsafe_allow_html=True)
-            st.markdown("---")
-            col1,col2= st.columns([1,1])    
+            with st.container(): 
+                co1,co2= st.columns([1,1])   
+                with co1: 
+                    st.write(sentiment_result, unsafe_allow_html=True)
+                with co2: 
+                    st.write(hate_result, unsafe_allow_html=True)
+            col1,col2= st.columns([1,1])
             with col1:
                 st.write("### Distribución de Sentimientos")
                 st.plotly_chart(fig_sentiment, use_container_width=True)
@@ -159,9 +161,10 @@ def main():
                 st.write("### Métricas de Odio")
                 st.plotly_chart(fig_hate, use_container_width=True)
 
-        if not st.session_state.analysis_df.empty:
-            st.subheader("Tabla de Resultados")
-            st.write(st.session_state.analysis_df)
+    # Mostrar siempre la tabla de resultados si no está vacía
+    if not st.session_state.analysis_df.empty:
+        st.subheader("Tabla de Resultados")
+        st.write(st.session_state.analysis_df)
 
     st.subheader("Importar Datos")
     
