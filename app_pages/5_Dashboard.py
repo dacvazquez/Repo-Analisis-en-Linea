@@ -345,6 +345,12 @@ def main():
                 normalize='index'
             ) * 100
 
+            # Asegurar que existan ambas columnas (True y False)
+            if True not in sentiment_hate_pattern.columns:
+                sentiment_hate_pattern[True] = 0
+            if False not in sentiment_hate_pattern.columns:
+                sentiment_hate_pattern[False] = 0
+
             # Colores personalizados
             colors = {
                 True: '#FF553B',   # Rojo para "Con Odio"
@@ -355,15 +361,16 @@ def main():
             fig_pattern = go.Figure()
 
             for hate in [True, False]:
-                fig_pattern.add_trace(go.Bar(
-                    name='Con Odio' if hate else 'Sin Odio',
-                    x=sentiment_hate_pattern.index,
-                    y=sentiment_hate_pattern[hate],
-                    text=sentiment_hate_pattern[hate].round(1).astype(str) + '%',
-                    textposition='inside',
-                    marker_color=colors[hate],
-                    hovertemplate='%{y:.1f}%<br>Sentimiento: %{x}<extra></extra>'
-                ))
+                if hate in sentiment_hate_pattern.columns:
+                    fig_pattern.add_trace(go.Bar(
+                        name='Con Odio' if hate else 'Sin Odio',
+                        x=sentiment_hate_pattern.index,
+                        y=sentiment_hate_pattern[hate],
+                        text=sentiment_hate_pattern[hate].round(1).astype(str) + '%',
+                        textposition='inside',
+                        marker_color=colors[hate],
+                        hovertemplate='%{y:.1f}%<br>Sentimiento: %{x}<extra></extra>'
+                    ))
 
             fig_pattern.update_layout(
                 barmode='stack',

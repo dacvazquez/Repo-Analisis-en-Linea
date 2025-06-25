@@ -161,16 +161,18 @@ with st.sidebar:
             
 
 # Navegación personalizada
+# Verificar si existen datos almacenados
+has_data = 'analysis_df' in st.session_state and not st.session_state.analysis_df.empty
+
 pg = st.navigation([
     st.Page("app_pages/Home.py", title="Inicio", icon="🏠"),
     # st.Page("app_pages/1_Individual_Analysis.py", title="Detección de Comportamiento", icon="🔍"),
     st.Page("app_pages/2_Tweets.py", title="Extracción de Tweets", icon="🐦"),
     #st.Page("app_pages/3_Social_Media_Scraper.py", title="Extracción de Comentarios", icon="📱"),
     st.Page("app_pages/4_Multiple_Analysis.py", title="Análisis de Texto", icon="🌐"),
-    st.Page("app_pages/5_Dashboard.py", title="Estadísticas del Análisis", icon="📊"),
-    st.Page("app_pages/6_Word_Analysis.py", title="Importancia de Palabras", icon="🔤"),
-    st.Page("app_pages/7_Tabla_Resultados.py", title="Tabla de Resultados", icon="🔍"),
-
+    *([st.Page("app_pages/5_Dashboard.py", title="Estadísticas del Análisis", icon="📊"),
+       st.Page("app_pages/6_Word_Analysis.py", title="Importancia de Palabras", icon="🔤"),
+       st.Page("app_pages/7_Tabla_Resultados.py", title="Tabla de Resultados", icon="🔍")] if has_data else [])
 ])
 
 pg.run()
