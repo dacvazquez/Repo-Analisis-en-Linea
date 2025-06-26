@@ -28,17 +28,20 @@ with col1:
             st.session_state.analysis_df.iloc[[row_to_edit-1, row_to_edit]] = \
                 st.session_state.analysis_df.iloc[[row_to_edit, row_to_edit-1]].values
             st.toast("Fila movida hacia arriba")
+            st.rerun()
 with col2:
     if st.button("⬇️ Mover Abajo"):
         if row_to_edit < len(editable_df) - 1:
             st.session_state.analysis_df.iloc[[row_to_edit, row_to_edit+1]] = \
                 st.session_state.analysis_df.iloc[[row_to_edit+1, row_to_edit]].values
             st.toast("Fila movida hacia abajo")
+            st.rerun()
 with col3:
     if st.button("🗑️ Eliminar Fila"):
         st.session_state.analysis_df.drop(index=row_to_edit, inplace=True)
         st.session_state.analysis_df.reset_index(drop=True, inplace=True)
         st.toast(f"Fila {row_to_edit} eliminada")
+        st.rerun()
 with col4:
     graficos = st.button("📊 Ver Gráficos")
 if graficos:
