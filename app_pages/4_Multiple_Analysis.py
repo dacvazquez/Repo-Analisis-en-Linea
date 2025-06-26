@@ -139,7 +139,7 @@ def main():
         st.rerun()
             
     if st.session_state.last_analysis_results:
-        with st.expander(f'Resultados del análisis para el texto: "*{st.session_state.last_analyzed_text}*"', icon="🔍", expanded=True):  
+        with st.expander(f'Resultados del análisis para el texto: *"{st.session_state.last_analyzed_text}"*', icon="🔍", expanded=True):  
             sentiment_result, hate_result, fig_sentiment, fig_hate = st.session_state.last_analysis_results
             with st.container(): 
                 co1,co2= st.columns([1,1])   
