@@ -14,7 +14,7 @@ Esta aplicación permite analizar el sentimiento y detectar discurso de odio en 
 
 1. Clona el repositorio:
 ```bash
-git clone [URL_DEL_REPOSITORIO]
+git clone https://github.com/dacvazquez/Repo-Analisis-en-Linea.git
 ```
 
 2. Instala las dependencias:
@@ -45,3 +45,4 @@ streamlit run streamlit_app.py
 
 - Python 3.12 o superior
 - Conexión a internet para descargar modelos y datos
+
